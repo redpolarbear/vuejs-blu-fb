@@ -10,25 +10,38 @@
         <p class="control has-icon">
           <input 
             class="input"
+            v-bind:class="[
+              { 'is-danger': $v.form.email.$error }
+            ]"
             type="email" 
-            placeholder="jsmith@example.org" 
+            placeholder="Email" 
             v-model="form.email"
             @input="$v.form.email.$touch()"
             @blur="$v.form.email.$touch()">
           <i class="fa fa-envelope"></i>
-          <!-- <span class="help is-danger" v-if="!$v.form.email.required">This email is required</span> -->
+          <span class="help is-danger" v-if="$v.form.email.$error">{{ emailErrors[0] }}</span>
           <!-- <pre>{{ $v.form.email }}</pre> -->
         </p>
         <label class="label">Password</label>
         <p class="control has-icon">
-          <input class="input" type="password" placeholder="●●●●●●●" v-model="form.password">
+          <input 
+            class="input"
+            v-bind:class="[
+              { 'is-danger': $v.form.password.$error }
+            ]"
+            type="password" 
+            placeholder="Password" 
+            v-model="form.password"
+            @input="$v.form.password.$touch()"
+            @blur="$v.form.password.$touch()">
           <i class="fa fa-lock"></i>
+          <span class="help is-danger" v-if="$v.form.password.$error">{{ passwordErrors[0] }}</span>
         </p>
       </div>
       <p class="control" slot="footer">
         <a 
           class="button is-primary" 
-          v-bind:class="{ 'is-loading': getLoading }"
+          v-bind:class="[{ 'is-loading': getLoading }, { 'is-disabled': $v.form.$invalid}]"
           @click.stop="onLogin" 
           >Login</a>
         <a class="button is-default" @click.stop="$emit('closeLogin', false)">Cancel</a>
@@ -38,7 +51,7 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, email, minLength } from 'vuelidate/lib/validators'
+import { required, email } from 'vuelidate/lib/validators'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -51,7 +64,6 @@ export default {
         email
       },
       password: {
-        minLength: minLength(6),
         required
       }
     }
@@ -77,7 +89,6 @@ export default {
     passwordErrors () {
       const errors = []
       if (!this.$v.form.password.$dirty) return errors
-      !this.$v.form.password.minLength && errors.push('Password must have at least 6 letters.')
       !this.$v.form.password.required && errors.push('Password is required.')
       return errors
     }

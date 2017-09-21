@@ -11,8 +11,7 @@
           <input 
             class="input"
             v-bind:class="[
-              { 'is-danger': $v.form.name.$error },
-              { 'is-success': $v.form.name.$dirty && !$v.form.name.$error }
+              { 'is-danger': $v.form.name.$error }
             ]"
             type="text" 
             placeholder="Full name" 
@@ -27,8 +26,7 @@
           <input 
             class="input"
             v-bind:class="[
-              { 'is-danger': $v.form.email.$error },
-              { 'is-success': $v.form.email.$dirty && !$v.form.email.$error }
+              { 'is-danger': $v.form.email.$error }
             ]"
             type="email" 
             placeholder="Email" 
@@ -40,13 +38,33 @@
         </p>
         <label class="label">Password</label>
         <p class="control has-icon">
-          <input class="input" type="password" placeholder="Password" v-model="form.password">
+          <input 
+            class="input" 
+            v-bind:class="[
+              { 'is-danger': $v.form.password.$error }
+            ]"
+            type="password" 
+            placeholder="Password" 
+            v-model="form.password"
+            @input="$v.form.password.$touch()"
+            @blur="$v.form.password.$touch()">
           <i class="fa fa-lock"></i>
+          <span class="help is-danger" v-if="$v.form.password.$error">{{ passwordErrors[0] }}</span>
         </p>
         <label class="label">Confirm Password</label>
         <p class="control has-icon">
-          <input class="input" type="password" placeholder="Confirm Password" v-model="form.confirmPassword">
+          <input 
+            class="input" 
+            v-bind:class="[
+              { 'is-danger': $v.form.confirmPassword.$error }
+            ]"
+            type="password" 
+            placeholder="Confirm Password" 
+            v-model="form.confirmPassword"
+            @input="$v.form.confirmPassword.$touch()"
+            @blur="$v.form.confirmPassword.$touch()">
           <i class="fa fa-lock"></i>
+          <span class="help is-danger" v-if="$v.form.confirmPassword.$error">{{ confirmPasswordErrors[0] }}</span>
         </p>
       </div>
       <p class="control" slot="footer">

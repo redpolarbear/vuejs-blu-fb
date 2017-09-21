@@ -33,9 +33,9 @@
           </a>
           <app-signup :showSignup="showSignup" @closeSignup="showSignup=$event"></app-signup>
         </span>
-        <a class="nav-item is-tab" v-if="userIsAuthenticated">
+        <router-link tag="a" class="nav-item is-tab" v-if="userIsAuthenticated" to="/profile">
           <img :src="getUser.photoURL" class="avatar-photo">
-        </a>
+        </router-link>
         <span class="nav-item" v-if="userIsAuthenticated">
           <a class="button" @click="onLogout">
             Log out
