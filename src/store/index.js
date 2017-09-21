@@ -8,12 +8,16 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: null,
+    profile: null,
     loading: false,
     error: null
   },
   mutations: {
     setUser (state, payload) {
       state.user = payload
+    },
+    setProfile (state, payload) {
+      state.profile = payload
     },
     setLoading (state, payload) {
       state.loading = payload
@@ -28,6 +32,9 @@ export default new Vuex.Store({
   getters: {
     getUser: (state) => {
       return state.user
+    },
+    getProfile: (state) => {
+      return state.profile
     },
     getLoading: (state) => {
       return state.loading
@@ -106,6 +113,25 @@ export default new Vuex.Store({
     },
     clearError ({commit}) {
       commit('clearError')
+    },
+    async loadUserProfile ({commit}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
+      try {
+        const userProfile = await firebase.database().ref('usersProfile/' + payload.id).once('value')
+        commit('setLoading', false)
+        if (userProfile.val()) {
+          commit('setProfile', userProfile.val())
+        } else {
+          commit('setError', 'User Profile was not found.')
+        }
+      } catch (error) {
+        // Handle Errors here.
+        let errorMessage = error.message
+        commit('setLoading', false)
+        commit('setError', errorMessage)
+        console.log(error)
+      }
     }
   }
 })

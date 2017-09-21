@@ -20,7 +20,6 @@
             @blur="$v.form.email.$touch()">
           <i class="fa fa-envelope"></i>
           <span class="help is-danger" v-if="$v.form.email.$error">{{ emailErrors[0] }}</span>
-          <!-- <pre>{{ $v.form.email }}</pre> -->
         </p>
         <label class="label">Password</label>
         <p class="control has-icon">

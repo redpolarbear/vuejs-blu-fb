@@ -1,18 +1,18 @@
 <template>
-  <div class="container profile">
+  <div class="container profile" v-if="getProfile">
     <div class="section profile-heading">
       <div class="columns">
         <div class="column is-2">
           <div class="image is-128x128 avatar">
-            <img src="https://placehold.it/256x256">
+            <img :src="getProfile.photoURL">
           </div>
         </div>
         <div class="column is-4 name">
           <p>
-            <span class="title is-bold">John Smith</span>
-            <span class="button is-primary is-outlined follow">Follow</span>
+            <span class="title is-bold">{{ getProfile.displayName }}</span>
+            <a class="button is-primary is-outlined follow">Follow</a>
           </p>
-          <p class="tagline">The users profile bio would go here, of course. It could be two lines</p>
+          <p class="tagline">{{ getProfile.about }}</p>
         </div>
         <div class="column is-2 followers has-text-centered">
           <p class="stat-val">129k</p>
@@ -42,58 +42,90 @@
 </template>
 
 <script>
-export default {
+import { mapGetters } from 'vuex'
+// import * as firebase from 'firebase'
 
+export default {
+  name: 'profile',
+  data () {
+    return {
+    }
+  },
+  props: ['id'],
+  created () {
+    console.log(this.id)
+    this.$store.dispatch('loadUserProfile', { id: this.id })
+  },
+  computed: {
+    ...mapGetters(['getProfile'])
+  },
+  methods: {
+  }
 }
 </script>
 
 <style scoped>
 .container.profile {
-  margin-top: 50px
+  margin-top:50px;
 }
 .profile-heading {
   margin: 20px 0;
   padding-bottom: 30px;
 }
-.section {
-  background-color: #fff;
-  padding: 40px 20px;
-}
-.avatar {
-  float: right;
-}
-.avatar img {
-  border-radius: 200px;
-}
 .profile-heading .name {
   border-right: 1px solid #f1f1f1;
-  margin: -30px 0;
+  margin:-30px 0;
   padding: 40px 30px 0 30px;
 }
 .profile-heading .followers, 
 .profile-heading .following {
   border-right: 1px solid #f1f1f1;
-  margin: -30px 0;
+  margin:-30px 0;
   padding: 70px 30px;
 }
 .profile-heading .likes {
-  margin: -30px 0;
+  margin:-30px 0;
   padding: 70px 30px;
 }
-.follow {
-  float: right;
-}
-.tagline {
-  padding: 20px 0;
-  font-size: 16px;
-  line-height: 1.4;
+.profile-heading .stat-key {
+  font-size: 20px;
+  font-weight: 200;
 }
 .profile-heading .stat-val {
   font-size: 35px;
   font-weight: bold;
 }
-.profile-heading .stat-key {
-  font-size: 20px;
-  font-weight: 200;
+.profile-options {
+  background-color: #f1f1f1;
+  margin:-20px 0 20px 0;
+}
+.profile-options .link a {
+  padding:18px;
+  font-size: 18px;
+}
+.profile-options .link .icon {
+  font-size: 16px;
+  padding-top:2px;
+}
+.tagline {
+  padding:20px 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.avatar {
+  float: right;
+}
+.follow {
+  float: right;
+}
+.avatar img {
+  border-radius: 200px;
+}
+p.title.is-bold {
+  font-weight: bold;
+}
+.card .timestamp {
+  float:right;
+  color:#bbb;
 }
 </style>
