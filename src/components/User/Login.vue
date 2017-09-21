@@ -1,10 +1,95 @@
 <template>
-  
+  <modal
+    :backdrop-closable="false" 
+    :is-show="showLogin" 
+    @close="$emit('closeLogin', false)"
+    :width="420">
+      <p class="title" slot="header">Login</p>
+      <div class="box">
+        <label class="label">Email</label>
+        <p class="control has-icon">
+          <input 
+            class="input"
+            type="email" 
+            placeholder="jsmith@example.org" 
+            v-model="form.email"
+            @input="$v.form.email.$touch()"
+            @blur="$v.form.email.$touch()">
+          <i class="fa fa-envelope"></i>
+          <!-- <span class="help is-danger" v-if="!$v.form.email.required">This email is required</span> -->
+          <!-- <pre>{{ $v.form.email }}</pre> -->
+        </p>
+        <label class="label">Password</label>
+        <p class="control has-icon">
+          <input class="input" type="password" placeholder="●●●●●●●" v-model="form.password">
+          <i class="fa fa-lock"></i>
+        </p>
+      </div>
+      <p class="control" slot="footer">
+        <a 
+          class="button is-primary" 
+          v-bind:class="{ 'is-loading': getLoading }"
+          @click.stop="onLogin" 
+          >Login</a>
+        <a class="button is-default" @click.stop="$emit('closeLogin', false)">Cancel</a>
+      </p>
+  </modal>
 </template>
 
 <script>
-export default {
+import { validationMixin } from 'vuelidate'
+import { required, email, minLength } from 'vuelidate/lib/validators'
+import { mapGetters } from 'vuex'
 
+export default {
+  name: 'login',
+  mixins: [validationMixin],
+  validations: {
+    form: {
+      email: {
+        required,
+        email
+      },
+      password: {
+        minLength: minLength(6),
+        required
+      }
+    }
+  },
+  data () {
+    return {
+      form: {
+        email: '',
+        password: ''
+      }
+    }
+  },
+  props: [ 'showLogin' ],
+  computed: {
+    ...mapGetters(['getUser', 'getLoading']),
+    emailErrors () {
+      const errors = []
+      if (!this.$v.form.email.$dirty) return errors
+      !this.$v.form.email.email && errors.push('Must be valid e-mail.')
+      !this.$v.form.email.required && errors.push('E-mail is required')
+      return errors
+    },
+    passwordErrors () {
+      const errors = []
+      if (!this.$v.form.password.$dirty) return errors
+      !this.$v.form.password.minLength && errors.push('Password must have at least 6 letters.')
+      !this.$v.form.password.required && errors.push('Password is required.')
+      return errors
+    }
+  },
+  methods: {
+    onLogin () {
+      this.$store.dispatch('signUserIn', {email: this.form.email, password: this.form.password})
+    },
+    onDismissed () {
+      this.$store.dispatch('clearError')
+    }
+  }
 }
 </script>
 

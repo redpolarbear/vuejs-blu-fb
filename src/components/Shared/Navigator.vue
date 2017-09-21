@@ -23,70 +23,74 @@
             <i class="fa" v-bind:class="item.icon"></i>
             &nbsp; {{ item.title }}
         </router-link>
-        <span class="nav-item">
-          <a class="button">
+        <span class="nav-item" v-if="!userIsAuthenticated">
+          <a class="button" @click="toggleLogin">
             Log in
           </a>
-          <a class="button is-info">
+          <app-login :showLogin="showLogin" @closeLogin="showLogin=$event"></app-login>
+          <a class="button is-info" @click="toggleSignup">
             Sign Up
+          </a>
+          <app-signup :showSignup="showSignup" @closeSignup="showSignup=$event"></app-signup>
+        </span>
+        <a class="nav-item is-tab" v-if="userIsAuthenticated">
+          <img :src="getUser.photoURL" class="avatar-photo">
+        </a>
+        <span class="nav-item" v-if="userIsAuthenticated">
+          <a class="button" @click="onLogout">
+            Log out
           </a>
         </span>
       </div>
     </div>
   </nav>
-  <!-- <nav class="nav has-shadow">
-    <div class="container">
-      <div class="nav-left">
-        
-      </div>
-      <div class="nav-center">
-        <a class="nav-item" href="#">
-          <span class="icon">
-            <i class="fa fa-twitter"></i>
-          </span>
-        </a>
-      </div>
-      <span class="nav-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
-      </span>
-      <div class="nav-right nav-menu">
-        
-      </div>
-    </div>
-  </nav> -->
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import LoginComponent from '../User/Login'
+import SignupComponent from '../User/Signup'
 
 export default {
   name: 'navigator',
+  components: {
+    'app-login': LoginComponent,
+    'app-signup': SignupComponent
+  },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      showLogin: false,
+      showSignup: false
     }
   },
   computed: {
-    ...mapGetters['getUser'],
+    ...mapGetters(['getUser']),
     menuItems () {
-      let menuItems = [
-        { icon: 'fa-home', title: 'Home', link: '/' }
-      ]
+      let menuItems = []
       if (this.userIsAuthenticated) {
         menuItems = [
-        { icon: 'fa-home', title: 'Home', link: '/' },
-        { icon: 'fa-bolt', title: 'Moments', link: '/moments' },
-        { icon: 'fa-bell-o', title: 'Notifications', link: '/notifications' },
-        { icon: 'fa-envelope', title: 'Messages', link: '/messages' }
+          { icon: 'fa-home', title: 'Home', link: '/' },
+          { icon: 'fa-bolt', title: 'Moments', link: '/moments' },
+          { icon: 'fa-bell-o', title: 'Notifications', link: '/notifications' },
+          { icon: 'fa-envelope', title: 'Messages', link: '/messages' }
         ]
       }
       return menuItems
+    },
+    userIsAuthenticated () {
+      return this.getUser !== null && this.getUser !== undefined
     }
   },
-  userIsAuthenticated () {
-    return this.getUser !== null && this.getUser !== undefined
+  methods: {
+    toggleLogin () {
+      this.showLogin = !this.showLogin
+    },
+    toggleSignup () {
+      this.showSignup = !this.showSignup
+    },
+    onLogout () {
+      this.$store.dispatch('logout')
+    }
   }
 }
 </script>
