@@ -1,18 +1,19 @@
 <template>
-  <div class="container profile" v-if="getProfile">
+  <div class="container profile" v-if="profile">
     <div class="section profile-heading">
       <div class="columns">
         <div class="column is-2">
           <div class="image is-128x128 avatar">
-            <img :src="getProfile.photoURL">
+            <img :src="profile.photoURL">
           </div>
         </div>
         <div class="column is-4 name">
           <p>
-            <span class="title is-bold">{{ getProfile.displayName }}</span>
-            <a class="button is-primary is-outlined follow">Follow</a>
+            <span class="title is-bold">{{ profile.displayName }}</span>
+            <a class="button is-primary is-outlined follow" v-if="isMyself">Edit</a>
+            <a class="button is-primary is-outlined follow" v-else>Follow</a>
           </p>
-          <p class="tagline">{{ getProfile.about }}</p>
+          <p class="tagline">{{ profile.about }}</p>
         </div>
         <div class="column is-2 followers has-text-centered">
           <p class="stat-val">129k</p>
@@ -52,12 +53,27 @@ export default {
     }
   },
   props: ['id'],
-  created () {
-    console.log(this.id)
-    this.$store.dispatch('loadUserProfile', { id: this.id })
-  },
   computed: {
-    ...mapGetters(['getProfile'])
+    ...mapGetters(['getProfile', 'getUser']),
+    profile () {
+      if (this.id === 'me' || this.id === null || this.id === undefined) {
+        return this.getUser
+      } else {
+        this.$store.dispatch('loadUserProfile', { id: this.id })
+        return this.getProfile
+      }
+    },
+    isMyself () {
+      if (this.getUser && this.profile) {
+        console.log(this.getUser._id)
+        console.log(this.profile._id)
+        if (this.getUser._id === this.profile._id) {
+          return true
+        } else {
+          return false
+        }
+      }
+    }
   },
   methods: {
   }
