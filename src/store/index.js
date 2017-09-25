@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import * as firebase from 'firebase'
 import _ from 'lodash'
+import shortid from 'shortid'
 
 Vue.use(Vuex)
 
@@ -114,17 +115,27 @@ export default new Vuex.Store({
     clearError ({commit}) {
       commit('clearError')
     },
-    async loadUserProfile ({commit}, payload) {
+    async loadUserProfile ({commit, state}, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
-        const userProfile = await firebase.database().ref('usersProfile/' + payload.id).once('value')
-        commit('setLoading', false)
-        if (userProfile.val()) {
-          commit('setProfile', userProfile.val())
+        let userId = ''
+        if (payload.id === null || payload.id === undefined) {
+          // default payload.id === null: load the profile of the logged-in user, setup the userId = state.user.id
+          userId = state.user._id
+        } else if (shortid.isValid(payload.id)) {
+          // if the payload.id is valid, load the profile of the user whose profile page is being visited, setup the userId = payload.id
+          // (async) if userProfile.val() !== null, commit('setProfile')
+          userId = payload.id
         } else {
-          commit('setError', 'User Profile was not found.')
+          // the payload.id is invalid, return null
+          commit('setLoading', false)
+          commit('setProfile', null)
+          return
         }
+        const userProfile = await firebase.database().ref('usersProfile/' + userId).once('value')
+        commit('setLoading', false)
+        commit('setProfile', userProfile.val())
       } catch (error) {
         // Handle Errors here.
         let errorMessage = error.message
@@ -132,6 +143,9 @@ export default new Vuex.Store({
         commit('setError', errorMessage)
         console.log(error)
       }
+    },
+    async followingUser ({commit, state}, payload) {
+      
     }
   }
 })

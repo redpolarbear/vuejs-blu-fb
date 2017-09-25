@@ -1,19 +1,19 @@
 <template>
-  <div class="container profile" v-if="profile">
+  <div class="container profile" v-if="getProfile">
     <div class="section profile-heading">
       <div class="columns">
         <div class="column is-2">
           <div class="image is-128x128 avatar">
-            <img :src="profile.photoURL">
+            <img :src="getProfile.photoURL">
           </div>
         </div>
         <div class="column is-4 name">
           <p>
-            <span class="title is-bold">{{ profile.displayName }}</span>
+            <span class="title is-bold">{{ getProfile.displayName }}</span>
             <a class="button is-primary is-outlined follow" v-if="isMyself">Edit</a>
-            <a class="button is-primary is-outlined follow" v-else>Follow</a>
+            <a class="button is-primary is-outlined follow" @click="onFollow" v-else>Follow</a>
           </p>
-          <p class="tagline">{{ profile.about }}</p>
+          <p class="tagline">{{ getProfile.about ? getProfile.about : 'This person is too lazy to leave anything.' }}</p>
         </div>
         <div class="column is-2 followers has-text-centered">
           <p class="stat-val">129k</p>
@@ -44,7 +44,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-// import * as firebase from 'firebase'
 
 export default {
   name: 'profile',
@@ -55,27 +54,25 @@ export default {
   props: ['id'],
   computed: {
     ...mapGetters(['getProfile', 'getUser']),
-    profile () {
-      if (this.id === 'me' || this.id === null || this.id === undefined) {
-        return this.getUser
-      } else {
-        this.$store.dispatch('loadUserProfile', { id: this.id })
-        return this.getProfile
-      }
-    },
     isMyself () {
-      if (this.getUser && this.profile) {
-        console.log(this.getUser._id)
-        console.log(this.profile._id)
-        if (this.getUser._id === this.profile._id) {
-          return true
-        } else {
-          return false
-        }
+      if (this.getUser.id === this.id) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
+  watch: {
+    getUser: function (value) {
+      if (value) {
+        this.$store.dispatch('loadUserProfile', { id: this.id })
       }
     }
   },
   methods: {
+    onFollow () {
+      this.$store.dispatch('followingUser', { id: this.id })
+    }
   }
 }
 </script>
