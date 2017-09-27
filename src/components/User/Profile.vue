@@ -11,16 +11,16 @@
           <p>
             <span class="title is-bold">{{ getProfile.displayName }}</span>
             <a class="button is-primary is-outlined follow" v-if="isMyself">Edit</a>
-            <a class="button is-primary is-outlined follow" @click="onFollow" v-else>Follow</a>
+            <a class="button is-primary is-outlined follow" v-bind:class="[{ 'is-loading': getLoading }]" @click="onFollow" v-else>Follow</a>
           </p>
-          <p class="tagline">{{ getProfile.about ? getProfile.about : 'This person is too lazy to leave anything.' }}</p>
+          <p class="tagline">{{ getProfile.about || 'This person is too lazy to leave anything.' }}</p>
         </div>
         <div class="column is-2 followers has-text-centered">
-          <p class="stat-val">129k</p>
+          <p class="stat-val">{{ getProfile.followersNo }}</p>
           <p class="stat-key">followers</p>
         </div>
         <div class="column is-2 following has-text-centered">
-          <p class="stat-val">2k</p>
+          <p class="stat-val">{{ getProfile.followingsNo }}</p>
           <p class="stat-key">following</p>
         </div>
         <div class="column is-2 likes has-text-centered">
@@ -53,9 +53,10 @@ export default {
   },
   props: ['id'],
   computed: {
-    ...mapGetters(['getProfile', 'getUser']),
+    ...mapGetters(['getProfile', 'getUser', 'getLoading']),
     isMyself () {
-      if (this.getUser.id === this.id) {
+      // if (this.getUser.id === this.id || this.id === null || this.id === undefined) {
+      if (this.getUser.id === this.getProfile.id) {
         return true
       } else {
         return false
@@ -65,13 +66,13 @@ export default {
   watch: {
     getUser: function (value) {
       if (value) {
-        this.$store.dispatch('loadUserProfile', { id: this.id })
+        this.$store.dispatch('loadUserProfileById', { id: this.id })
       }
     }
   },
   methods: {
     onFollow () {
-      this.$store.dispatch('followingUser', { id: this.id })
+      this.$store.dispatch('followUser', { id: this.id })
     }
   }
 }

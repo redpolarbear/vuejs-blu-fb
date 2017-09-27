@@ -149,7 +149,7 @@ export default {
   methods: {
     onSignup () {
       const defaultUserProfile = {
-        _id: shortid.generate(),
+        id: shortid.generate(),
         displayName: this.form.name,
         email: this.form.email,
         password: this.form.password,

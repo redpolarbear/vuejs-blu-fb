@@ -51,7 +51,7 @@ export default new Vuex.Store({
       try {
         const newUser = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
         const newUserProfile = await newUser.updateProfile({
-          displayName: payload._id,
+          displayName: payload.id,
           photoURL: payload.photoURL
         })
         await Promise.all([newUser, newUserProfile])
@@ -60,14 +60,14 @@ export default new Vuex.Store({
             ..._.omit(payload, 'password'),
             uid: newUser.uid
           }
-          firebase.database().ref('usersProfile').child(payload._id).update({
+          firebase.database().ref('usersProfile').child(payload.id).update({
             ...user,
             createdAt: firebase.database.ServerValue.TIMESTAMP,
             updatedAt: firebase.database.ServerValue.TIMESTAMP
           })
-          commit('setLoading', false)
           commit('setUser', user)
         }
+        commit('setLoading', false)
       } catch (error) {
         // Handle Errors here.
         var errorCode = error.code
@@ -81,16 +81,15 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-    async signUserIn ({commit}, payload) {
+    async signUserIn ({commit, dispatch}, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
         const user = await firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
         if (user) {
-          const userProfile = await firebase.database().ref('usersProfile/' + user.displayName).once('value')
-          commit('setLoading', false)
-          commit('setUser', userProfile.val())
+          commit('setUser', await dispatch('loadProfileByDefault', user.displayName))
         }
+        commit('setLoading', false)
       } catch (error) {
         // Handle Errors here.
         let errorCode = error.code
@@ -104,38 +103,51 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-    async autoSignIn ({commit}, payload) {
-      const userProfile = await firebase.database().ref('usersProfile/' + payload.displayName).once('value')
-      commit('setUser', userProfile.val())
+    async loadProfileByDefault ({commit, state}, id) {
+      try {
+        // load the profile
+        const userProfile = firebase.database().ref('usersProfile/' + id).once('value')
+        // load the followings and the followers
+        const userFollowings = firebase.database().ref('followings/' + id).once('value')
+        const userFollowers = firebase.database().ref('followers/' + id).once('value')
+        const values = await Promise.all([userProfile, userFollowings, userFollowers])
+        // if the id is valid but the user does not exist, return null
+        return Promise.resolve(values[0].val() ? {...(Object.assign({}, values[0].val())),
+          followingsNo: values[1].numChildren() || 0,
+          followersNo: values[2].numChildren() || 0} : null)
+      } catch (error) {
+        // Handle Errors here.
+        let errorMessage = error.message
+        commit('setError', errorMessage)
+        console.log(error)
+      }
+    },
+    async autoSignIn ({commit, dispatch}, payload) {
+      commit('setUser', await dispatch('loadProfileByDefault', payload.displayName))
     },
     logout ({commit}) {
       firebase.auth().signOut()
       commit('setUser', null)
+      commit('setProfile', null)
     },
     clearError ({commit}) {
       commit('clearError')
     },
-    async loadUserProfile ({commit, state}, payload) {
+    async loadUserProfileById ({commit, state, dispatch}, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
-        let userId = ''
         if (payload.id === null || payload.id === undefined) {
           // default payload.id === null: load the profile of the logged-in user, setup the userId = state.user.id
-          userId = state.user._id
+          commit('setProfile', state.user)
         } else if (shortid.isValid(payload.id)) {
           // if the payload.id is valid, load the profile of the user whose profile page is being visited, setup the userId = payload.id
-          // (async) if userProfile.val() !== null, commit('setProfile')
-          userId = payload.id
+          commit('setProfile', await dispatch('loadProfileByDefault', payload.id))
         } else {
           // the payload.id is invalid, return null
-          commit('setLoading', false)
           commit('setProfile', null)
-          return
         }
-        const userProfile = await firebase.database().ref('usersProfile/' + userId).once('value')
         commit('setLoading', false)
-        commit('setProfile', userProfile.val())
       } catch (error) {
         // Handle Errors here.
         let errorMessage = error.message
@@ -144,8 +156,34 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-    async followingUser ({commit, state}, payload) {
-      
+    async followUser ({commit, state}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
+      // check the payload.id is valid
+      if (shortid.isValid(payload.id)) {
+        try {
+          // TODO: check if the user who is going to follow exists - db.ref('usersProfile').hasChild('payload.id')
+          const usersProfile = await firebase.database().ref('usersProfile').once('value')
+          // console.log(usersProfile.hasChild(payload.id))
+          if (usersProfile.hasChild(payload.id)) {
+            const addFollowings = firebase.database().ref('followings/' + state.user.id).child(payload.id).set(true)
+            const addFollowers = firebase.database().ref('followers/' + payload.id).child(state.user.id).set(true)
+            await Promise.all([addFollowings, addFollowers])
+          }
+        } catch (error) {
+          // Handle Errors here.
+          let errorMessage = error.message
+          commit('setLoading', false)
+          commit('setError', errorMessage)
+          console.log(error)
+        }
+      }
+      commit('setLoading', false)
+    },
+    async unfollowUser ({commit, state}, payload) {
+    },
+    relationshipChk ({commit, state}, payload) {
+      // check the 
     }
   }
 })
