@@ -11,7 +11,7 @@
           <p>
             <span class="title is-bold">{{ getProfile.displayName }}</span>
             <a class="button is-primary is-outlined follow" v-if="isMyself">Edit</a>
-            <a class="button is-primary is-outlined follow" v-bind:class="[{ 'is-loading': getLoading }]" @click="onFollow" v-else>Follow</a>
+            <a class="button is-primary is-outlined follow" v-bind:class="[{ 'is-loading': getLoading }]" @click="onFollow" v-else>{{ getIsFollowing ? 'Unfollow' : 'Follow' }}</a>
           </p>
           <p class="tagline">{{ getProfile.about || 'This person is too lazy to leave anything.' }}</p>
         </div>
@@ -44,6 +44,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import localStorage from 'localStorage'
 
 export default {
   name: 'profile',
@@ -53,22 +54,38 @@ export default {
   },
   props: ['id'],
   computed: {
-    ...mapGetters(['getProfile', 'getUser', 'getLoading']),
+    ...mapGetters(['getProfile', 'getUser', 'getLoading', 'getIsFollowing']),
     isMyself () {
-      // if (this.getUser.id === this.id || this.id === null || this.id === undefined) {
-      if (this.getUser.id === this.getProfile.id) {
-        return true
-      } else {
-        return false
+      if (this.getUser && this.getProfile) {
+        if (this.getUser.id === this.getProfile.id) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   },
-  watch: {
-    getUser: function (value) {
-      if (value) {
-        this.$store.dispatch('loadUserProfileById', { id: this.id })
+  beforeRouteEnter (to, from, next) {
+    const authUserKey = Object.keys(localStorage).filter(keys => keys.startsWith('firebase:authUser'))[0]
+    const authUserId = JSON.parse(localStorage.getItem(authUserKey)).displayName
+    next(vm => {
+      if (to.params.id) {
+        vm.$store.dispatch('loadUserProfileById', { id: to.params.id })
+        console.log(authUserId)
+        vm.$store.dispatch('relationshipChk', { id: to.params.id, authUserId: authUserId })
+      } else {
+        vm.$store.dispatch('loadUserProfileById', { id: authUserId })
       }
+    })
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.$store.commit('setProfile', null)
+    if (to.params.id) {
+      this.$store.dispatch('loadUserProfileById', { id: to.params.id })
+    } else {
+      this.$store.dispatch('loadUserProfileById', { id: this.getUser.id })
     }
+    next()
   },
   methods: {
     onFollow () {

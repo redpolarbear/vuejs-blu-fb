@@ -33,7 +33,7 @@
           </a>
           <app-signup :showSignup="showSignup" @closeSignup="showSignup=$event"></app-signup>
         </span>
-        <router-link tag="a" class="nav-item is-tab" v-if="userIsAuthenticated" to="/profile">
+        <router-link tag="a" class="nav-item is-tab" v-if="userIsAuthenticated" to="/profile" exact="">
           <img :src="getUser.photoURL" class="avatar-photo">
         </router-link>
         <span class="nav-item" v-if="userIsAuthenticated">

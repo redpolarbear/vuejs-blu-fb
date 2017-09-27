@@ -10,6 +10,7 @@ export default new Vuex.Store({
   state: {
     user: null,
     profile: null,
+    isFollowing: false,
     loading: false,
     error: null
   },
@@ -19,6 +20,9 @@ export default new Vuex.Store({
     },
     setProfile (state, payload) {
       state.profile = payload
+    },
+    setIsFollowing (state, payload) {
+      state.isFollowing = payload
     },
     setLoading (state, payload) {
       state.loading = payload
@@ -36,6 +40,9 @@ export default new Vuex.Store({
     },
     getProfile: (state) => {
       return state.profile
+    },
+    getIsFollowing: (state) => {
+      return state.isFollowing
     },
     getLoading: (state) => {
       return state.loading
@@ -137,10 +144,7 @@ export default new Vuex.Store({
       commit('setLoading', true)
       commit('clearError')
       try {
-        if (payload.id === null || payload.id === undefined) {
-          // default payload.id === null: load the profile of the logged-in user, setup the userId = state.user.id
-          commit('setProfile', state.user)
-        } else if (shortid.isValid(payload.id)) {
+        if (shortid.isValid(payload.id)) {
           // if the payload.id is valid, load the profile of the user whose profile page is being visited, setup the userId = payload.id
           commit('setProfile', await dispatch('loadProfileByDefault', payload.id))
         } else {
@@ -162,10 +166,10 @@ export default new Vuex.Store({
       // check the payload.id is valid
       if (shortid.isValid(payload.id)) {
         try {
-          // TODO: check if the user who is going to follow exists - db.ref('usersProfile').hasChild('payload.id')
-          const usersProfile = await firebase.database().ref('usersProfile').once('value')
+          // check if the user who is going to follow exists - db.ref('usersProfile').hasChild('payload.id')
+          const usersProfile = await firebase.database().ref('usersProfile/' + payload.id).once('value')
           // console.log(usersProfile.hasChild(payload.id))
-          if (usersProfile.hasChild(payload.id)) {
+          if (usersProfile.val()) {
             const addFollowings = firebase.database().ref('followings/' + state.user.id).child(payload.id).set(true)
             const addFollowers = firebase.database().ref('followers/' + payload.id).child(state.user.id).set(true)
             await Promise.all([addFollowings, addFollowers])
@@ -182,8 +186,16 @@ export default new Vuex.Store({
     },
     async unfollowUser ({commit, state}, payload) {
     },
-    relationshipChk ({commit, state}, payload) {
-      // check the 
+    async relationshipChk ({commit, state}, payload) {
+      try {
+        const myFollowings = await firebase.database().ref('followings/' + payload.authUserId + '/' + payload.id).once('value')
+        console.log(myFollowings.val())
+        commit('setIsFollowing', !!myFollowings.val())
+      } catch (error) {
+        // Handle Errors here.
+        let errorMessage = error.message
+        commit('setError', errorMessage)
+      }
     }
   }
 })
