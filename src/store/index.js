@@ -10,6 +10,7 @@ export default new Vuex.Store({
   state: {
     user: null,
     profile: null,
+    userInfo: null,
     isFollowing: false,
     loading: false,
     error: null
@@ -20,6 +21,9 @@ export default new Vuex.Store({
     },
     setProfile (state, payload) {
       state.profile = payload
+    },
+    setUserInfo (state, payload) {
+      state.userInfo = payload
     },
     setIsFollowing (state, payload) {
       state.isFollowing = payload
@@ -52,7 +56,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async signUserUp ({commit}, payload) {
+    async signUserUp ({ state, commit, dispatch }, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
@@ -72,7 +76,8 @@ export default new Vuex.Store({
             createdAt: firebase.database.ServerValue.TIMESTAMP,
             updatedAt: firebase.database.ServerValue.TIMESTAMP
           })
-          commit('setUser', user)
+          await dispatch('loadProfileByDefault', payload.id)
+          commit('setUser', state.userInfo)
         }
         commit('setLoading', false)
       } catch (error) {
@@ -88,13 +93,14 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-    async signUserIn ({commit, dispatch}, payload) {
+    async signUserIn ({state, commit, dispatch}, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
         const user = await firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
         if (user) {
-          commit('setUser', await dispatch('loadProfileByDefault', user.displayName))
+          await dispatch('loadProfileByDefault', user.displayName)
+          commit('setUser', state.userInfo)
         }
         commit('setLoading', false)
       } catch (error) {
@@ -119,7 +125,7 @@ export default new Vuex.Store({
         const userFollowers = firebase.database().ref('followers/' + id).once('value')
         const values = await Promise.all([userProfile, userFollowings, userFollowers])
         // if the id is valid but the user does not exist, return null
-        return Promise.resolve(values[0].val() ? {...(Object.assign({}, values[0].val())),
+        commit('setUserInfo', values[0].val() ? {...(Object.assign({}, values[0].val())),
           followingsNo: values[1].numChildren() || 0,
           followersNo: values[2].numChildren() || 0} : null)
       } catch (error) {
@@ -129,8 +135,9 @@ export default new Vuex.Store({
         console.log(error)
       }
     },
-    async autoSignIn ({commit, dispatch}, payload) {
-      commit('setUser', await dispatch('loadProfileByDefault', payload.displayName))
+    async autoSignIn ({state, commit, dispatch}, payload) {
+      await dispatch('loadProfileByDefault', payload.displayName)
+      commit('setUser', state.userInfo)
     },
     logout ({commit}) {
       firebase.auth().signOut()
@@ -140,13 +147,14 @@ export default new Vuex.Store({
     clearError ({commit}) {
       commit('clearError')
     },
-    async loadUserProfileById ({commit, state, dispatch}, payload) {
+    async loadUserProfileById ({ state, commit, dispatch }, payload) {
       commit('setLoading', true)
       commit('clearError')
       try {
         if (shortid.isValid(payload.id)) {
           // if the payload.id is valid, load the profile of the user whose profile page is being visited, setup the userId = payload.id
-          commit('setProfile', await dispatch('loadProfileByDefault', payload.id))
+          await dispatch('loadProfileByDefault', payload.id)
+          commit('setProfile', state.userInfo)
         } else {
           // the payload.id is invalid, return null
           commit('setProfile', null)
@@ -185,12 +193,35 @@ export default new Vuex.Store({
       commit('setLoading', false)
     },
     async unfollowUser ({commit, state}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
+      // check the payload.id is valid
+      if (shortid.isValid(payload.id)) {
+        try {
+          // check if the user who is going to follow exists - db.ref('usersProfile').hasChild('payload.id')
+          const usersProfile = await firebase.database().ref('usersProfile/' + payload.id).once('value')
+          // console.log(usersProfile.hasChild(payload.id))
+          if (usersProfile.val()) {
+            const addFollowings = firebase.database().ref('followings/' + state.user.id).child(payload.id).set(null)
+            const addFollowers = firebase.database().ref('followers/' + payload.id).child(state.user.id).set(null)
+            await Promise.all([addFollowings, addFollowers])
+          }
+        } catch (error) {
+          // Handle Errors here.
+          let errorMessage = error.message
+          commit('setLoading', false)
+          commit('setError', errorMessage)
+          console.log(error)
+        }
+      }
+      commit('setLoading', false)
     },
-    async relationshipChk ({commit, state}, payload) {
+    relationshipCheck ({commit, state}, payload) {
       try {
-        const myFollowings = await firebase.database().ref('followings/' + payload.authUserId + '/' + payload.id).once('value')
-        console.log(myFollowings.val())
-        commit('setIsFollowing', !!myFollowings.val())
+        // const myFollowings = await firebase.database().ref('followings/' + payload.authUserId + '/' + payload.id).once('value')
+        firebase.database().ref('followings/' + payload.authUserId + '/' + payload.id).on('value', function (snapshot) {
+          commit('setIsFollowing', !!snapshot.val())
+        })
       } catch (error) {
         // Handle Errors here.
         let errorMessage = error.message

@@ -11,7 +11,10 @@
           <p>
             <span class="title is-bold">{{ getProfile.displayName }}</span>
             <a class="button is-primary is-outlined follow" v-if="isMyself">Edit</a>
-            <a class="button is-primary is-outlined follow" v-bind:class="[{ 'is-loading': getLoading }]" @click="onFollow" v-else>{{ getIsFollowing ? 'Unfollow' : 'Follow' }}</a>
+            <a class="button follow is-primary" v-bind:class="[{ 'is-loading': getLoading }]"
+              @click="onUnfollow" v-else-if="getIsFollowing">Following</a>
+            <a class="button follow is-outlined" v-bind:class="[{ 'is-loading': getLoading }]"
+              @click="onFollow" v-else-if="!getIsFollowing">Follow</a>
           </p>
           <p class="tagline">{{ getProfile.about || 'This person is too lazy to leave anything.' }}</p>
         </div>
@@ -65,18 +68,19 @@ export default {
       }
     }
   },
-  beforeRouteEnter (to, from, next) {
+  created () {
     const authUserKey = Object.keys(localStorage).filter(keys => keys.startsWith('firebase:authUser'))[0]
     const authUserId = JSON.parse(localStorage.getItem(authUserKey)).displayName
-    next(vm => {
-      if (to.params.id) {
-        vm.$store.dispatch('loadUserProfileById', { id: to.params.id })
-        console.log(authUserId)
-        vm.$store.dispatch('relationshipChk', { id: to.params.id, authUserId: authUserId })
-      } else {
-        vm.$store.dispatch('loadUserProfileById', { id: authUserId })
+    if (this.$route.params.id === null || this.$route.params.id === undefined) {
+      const authUserKey = Object.keys(localStorage).filter(keys => keys.startsWith('firebase:authUser'))[0]
+      const authUserId = JSON.parse(localStorage.getItem(authUserKey)).displayName
+      if (authUserId) {
+        this.$store.dispatch('loadUserProfileById', { id: authUserId })
       }
-    })
+    } else {
+      this.$store.dispatch('relationshipCheck', { id: this.$route.params.id, authUserId })
+      this.$store.dispatch('loadUserProfileById', { id: this.$route.params.id })
+    }
   },
   beforeRouteUpdate (to, from, next) {
     this.$store.commit('setProfile', null)
@@ -90,6 +94,9 @@ export default {
   methods: {
     onFollow () {
       this.$store.dispatch('followUser', { id: this.id })
+    },
+    onUnfollow () {
+      this.$store.dispatch('unfollowUser', { id: this.id })
     }
   }
 }
