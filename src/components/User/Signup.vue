@@ -69,7 +69,7 @@
       </div>
       <p class="control" slot="footer">
         <a class="button is-primary" v-bind:class="[{ 'is-loading': getLoading }, { 'is-disabled': $v.form.$invalid }]" @click.stop="onSignup" >Register</a>
-        <a class="button is-default" @click="$emit('closeSignup', false)">Cancel</a>
+        <a class="button is-default" @click="$store.commit('toggleShowSignup', false)">Cancel</a>
       </p>
   </modal>
 </template>

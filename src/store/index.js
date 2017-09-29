@@ -13,7 +13,9 @@ export default new Vuex.Store({
     userInfo: null,
     isFollowing: false,
     loading: false,
-    error: null
+    error: null,
+    showLogin: false,
+    showSignup: false
   },
   mutations: {
     setUser (state, payload) {
@@ -30,6 +32,12 @@ export default new Vuex.Store({
     },
     setLoading (state, payload) {
       state.loading = payload
+    },
+    toggleShowLogin (state, payload) {
+      state.showLogin = payload
+    },
+    toggleShowSignup (state, payload) {
+      state.showSignup = payload
     },
     setError (state, payload) {
       state.error = payload
@@ -50,6 +58,12 @@ export default new Vuex.Store({
     },
     getLoading: (state) => {
       return state.loading
+    },
+    getShowLogin: (state) => {
+      return state.showLogin
+    },
+    getShowSignup: (state) => {
+      return state.showSignup
     },
     getError: (state) => {
       return state.error
@@ -80,6 +94,7 @@ export default new Vuex.Store({
           commit('setUser', state.userInfo)
         }
         commit('setLoading', false)
+        commit('toggleShowSignup', false)
       } catch (error) {
         // Handle Errors here.
         var errorCode = error.code
@@ -89,6 +104,7 @@ export default new Vuex.Store({
           errorMessage = 'The password is too weak.'
         }
         commit('setLoading', false)
+        commit('toggleShowSignup', false)
         commit('setError', errorMessage)
         console.log(error)
       }
@@ -103,6 +119,7 @@ export default new Vuex.Store({
           commit('setUser', state.userInfo)
         }
         commit('setLoading', false)
+        commit('toggleShowLogin', false)
       } catch (error) {
         // Handle Errors here.
         let errorCode = error.code
@@ -112,6 +129,7 @@ export default new Vuex.Store({
           errorMessage = 'Wrong password.'
         }
         commit('setLoading', false)
+        commit('toggleShowLogin', false)
         commit('setError', errorMessage)
         console.log(error)
       }
@@ -143,6 +161,7 @@ export default new Vuex.Store({
       firebase.auth().signOut()
       commit('setUser', null)
       commit('setProfile', null)
+      commit('setUserInfo', null)
     },
     clearError ({commit}) {
       commit('clearError')

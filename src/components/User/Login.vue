@@ -43,7 +43,8 @@
           v-bind:class="[{ 'is-loading': getLoading }, { 'is-disabled': $v.form.$invalid}]"
           @click.stop="onLogin" 
           >Login</a>
-        <a class="button is-default" @click.stop="$emit('closeLogin', false)">Cancel</a>
+        <!-- <a class="button is-default" @click.stop="$emit('closeLogin', false)">Cancel</a> -->
+        <a class="button is-default" @click="$store.commit('toggleShowLogin', false)">Cancel</a>
       </p>
   </modal>
 </template>

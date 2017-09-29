@@ -27,17 +27,18 @@
           <a class="button" @click="toggleLogin">
             Log in
           </a>
-          <app-login :showLogin="showLogin" @closeLogin="showLogin=$event"></app-login>
+          <!-- <app-login :showLogin="showLogin" @closeLogin="showLogin=$event"></app-login> -->
+          <app-login :showLogin="getShowLogin"></app-login>
           <a class="button is-info" @click="toggleSignup">
             Sign Up
           </a>
-          <app-signup :showSignup="showSignup" @closeSignup="showSignup=$event"></app-signup>
+          <app-signup :showSignup="getShowSignup"></app-signup>
         </span>
         <!-- <router-link tag="a" class="nav-item is-tab" v-if="userIsAuthenticated" to="/profile" exact>
           <img :src="getUser.photoURL" class="avatar-photo">
         </router-link> -->
         <span class="nav-item is-tab" v-if="userIsAuthenticated">
-          <dropdown>
+          <dropdown trigger="hover">
             <a class="button is-white">
               <img :src="getUser.photoURL" class="avatar-photo">
               <span class="icon is-small">
@@ -48,7 +49,7 @@
               <menus>
                 <menu-item icon="user" to="/profile">My Profile</menu-item>
                 <div class="divider"></div>
-                <menu-item icon="sign-out">Log out</menu-item>
+                <menu-item icon="sign-out" :click="onLogout">Log out</menu-item>
               </menus>
             </div>
           </dropdown>
@@ -76,12 +77,10 @@ export default {
   },
   data () {
     return {
-      showLogin: false,
-      showSignup: false
     }
   },
   computed: {
-    ...mapGetters(['getUser']),
+    ...mapGetters(['getUser', 'getShowLogin', 'getShowSignup']),
     menuItems () {
       let menuItems = []
       if (this.userIsAuthenticated) {
@@ -100,10 +99,10 @@ export default {
   },
   methods: {
     toggleLogin () {
-      this.showLogin = !this.showLogin
+      this.$store.commit('toggleShowLogin', true)
     },
     toggleSignup () {
-      this.showSignup = !this.showSignup
+      this.$store.commit('toggleShowSignup', true)
     },
     onLogout () {
       this.$store.dispatch('logout')
