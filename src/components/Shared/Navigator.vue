@@ -55,7 +55,7 @@
           </dropdown>
         </span>
         <span class="nav-item" v-if="userIsAuthenticated">
-          <a class="button is-primary" @click="onLogout">
+          <a class="button is-primary">
             Publish
           </a>
         </span>
