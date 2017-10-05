@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 import Home from '@/components/Home'
 import Profile from '@/components/User/Profile'
+import CreateNewBook from '@/components/Library/Book/CreateBook'
 
 Vue.use(Router)
 
@@ -19,6 +20,11 @@ export default new Router({
       name: 'Profile',
       props: true,
       component: Profile
+    },
+    {
+      path: '/library/book/new',
+      name: 'CreateNewBook',
+      component: CreateNewBook
     }
   ]
 })
