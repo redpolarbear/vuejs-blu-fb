@@ -4,23 +4,18 @@ import * as firebase from 'firebase'
 import _ from 'lodash'
 import shortid from 'shortid'
 
+import * as types from './types'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: null,
     profile: null,
     userInfo: null,
     isFollowing: false,
-    loading: false,
-    error: null,
-    showLogin: false,
-    showSignup: false
+
   },
   mutations: {
-    setUser (state, payload) {
-      state.user = payload
-    },
     setProfile (state, payload) {
       state.profile = payload
     },
@@ -29,44 +24,20 @@ export default new Vuex.Store({
     },
     setIsFollowing (state, payload) {
       state.isFollowing = payload
-    },
-    setLoading (state, payload) {
-      state.loading = payload
-    },
-    toggleShowLogin (state, payload) {
-      state.showLogin = payload
-    },
-    toggleShowSignup (state, payload) {
-      state.showSignup = payload
-    },
-    setError (state, payload) {
-      state.error = payload
-    },
-    clearError (state) {
-      state.error = null
     }
   },
   getters: {
-    getUser: (state) => {
-      return state.user
-    },
     getProfile: (state) => {
       return state.profile
     },
     getIsFollowing: (state) => {
       return state.isFollowing
     },
-    getLoading: (state) => {
-      return state.loading
-    },
     getShowLogin: (state) => {
       return state.showLogin
     },
     getShowSignup: (state) => {
       return state.showSignup
-    },
-    getError: (state) => {
-      return state.error
     }
   },
   actions: {
