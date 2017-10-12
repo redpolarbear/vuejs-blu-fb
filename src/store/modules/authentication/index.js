@@ -11,6 +11,12 @@ const state = {
 const getters = {
   GET_USER: (state) => {
     return state.user
+  },
+  GET_LOGIN_MODAL: (state) => {
+    return state.showLogin
+  },
+  GET_SIGNUP_MODAL: (state) => {
+    return state.showSignup
   }
 }
 
@@ -31,13 +37,13 @@ const actions = {
     commit(types.SET_LOADING, true)
     commit(types.CLEAR_ERROR)
     try {
-      const newUser = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-      // const newUserProfile = await newUser.updateProfile({
-      await newUser.updateProfile({
+      const newUser = firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+      const newUserProfile = newUser.updateProfile({
+      // await newUser.updateProfile({
         displayName: payload.id,
         photoURL: payload.photoURL
       })
-      // await Promise.all([newUser, newUserProfile])
+      await Promise.all([newUser, newUserProfile])
       if (newUser) {
         const user = {
           ..._.omit(payload, 'password'),
@@ -91,6 +97,16 @@ const actions = {
       commit(types.SET_ERROR, errorMessage)
       console.log(error)
     }
+  },
+  async AUTO_SIGNIN ({state, commit, dispatch}, payload) {
+    await dispatch('loadProfileByDefault', payload.displayName)
+    commit(types.SET_USER, state.userInfo)
+  },
+  LOGOUT ({commit}) {
+    firebase.auth().signOut()
+    commit(types.SET_USER, null)
+    commit('setProfile', null)
+    commit('setUserInfo', null)
   }
 }
 

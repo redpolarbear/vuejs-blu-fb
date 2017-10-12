@@ -13,5 +13,7 @@ export const SET_USER = 'authentication/SET_USER'
 export const TOGGLE_LOGIN_MODAL = 'authentication/TOGGLE_LOGIN_MODAL'
 export const TOGGLE_SIGNUP_MODAL = 'authentication/TOGGLE_SIGNUP_MODAL'
 
+export const SET_USER_INFO = 'profile/SET_USER_INFO'
+
 // Actions
 
