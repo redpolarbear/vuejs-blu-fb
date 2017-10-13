@@ -69,7 +69,7 @@
       </div>
       <p class="control" slot="footer">
         <a class="button is-primary" v-bind:class="[{ 'is-loading': getLoading }, { 'is-disabled': $v.form.$invalid }]" @click.stop="onSignup" >Register</a>
-        <a class="button is-default" @click="$store.commit('toggleShowSignup', false)">Cancel</a>
+        <a class="button is-default" @click="onCancel">Cancel</a>
       </p>
   </modal>
 </template>
@@ -80,6 +80,8 @@ import { required, email, minLength, maxLength, sameAs } from 'vuelidate/lib/val
 import { mapGetters } from 'vuex'
 import md5 from 'md5'
 import shortid from 'shortid'
+
+import * as types from '../../store/types'
 
 export default {
   name: 'signup',
@@ -116,7 +118,10 @@ export default {
   },
   props: [ 'showSignup' ],
   computed: {
-    ...mapGetters(['getUser', 'getLoading']),
+    ...mapGetters({
+      getUser: types.USER,
+      getLoading: types.LOADING
+    }),
     nameErrors () {
       const errors = []
       if (!this.$v.form.name.$dirty) return errors
@@ -157,10 +162,13 @@ export default {
         location: null,
         about: null
       }
-      this.$store.dispatch('signUserUp', defaultUserProfile)
+      this.$store.dispatch(types.ACTION_USER_SIGNUP_ASYNC, defaultUserProfile)
+    },
+    onCancel () {
+      this.$store.commit(types.TOGGLE_SIGNUP_MODAL, false)
     },
     onDismissed () {
-      this.$store.dispatch('clearError')
+      this.$store.dispatch(types.CLEAR_ERROR)
     }
   }
 }

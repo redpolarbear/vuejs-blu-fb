@@ -9,6 +9,8 @@ import NavComponent from './components/Shared/Navigator.vue'
 import router from './router'
 import store from './store'
 
+import * as types from './store/types'
+
 // global css import
 import './assets/css/vue-blu.min.css'
 
@@ -36,7 +38,7 @@ new Vue({
     firebase.initializeApp(fbConfig)
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.$store.dispatch('autoSignIn', user)
+        this.$store.dispatch(types.ACTION_AUTO_SIGNIN, user)
       }
     })
   }

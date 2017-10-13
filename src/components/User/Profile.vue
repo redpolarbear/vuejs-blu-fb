@@ -48,6 +48,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import localStorage from 'localStorage'
+import * as types from '../../store/types'
 
 export default {
   name: 'profile',
@@ -57,7 +58,12 @@ export default {
   },
   props: ['id'],
   computed: {
-    ...mapGetters(['getProfile', 'getUser', 'getLoading', 'getIsFollowing']),
+    ...mapGetters({
+      getProfile: types.USER_PROFILE,
+      getUser: types.USER,
+      getLoading: types.LOADING,
+      getIsFollowing: types.IS_FOLLOWING
+    }),
     isMyself () {
       if (this.getUser && this.getProfile) {
         if (this.getUser.id === this.getProfile.id) {
@@ -75,28 +81,28 @@ export default {
       const authUserKey = Object.keys(localStorage).filter(keys => keys.startsWith('firebase:authUser'))[0]
       const authUserId = JSON.parse(localStorage.getItem(authUserKey)).displayName
       if (authUserId) {
-        this.$store.dispatch('loadUserProfileById', { id: authUserId })
+        this.$store.dispatch(types.ACTION_LOAD_USER_PROFILE_BY_ID_ASYNC, { id: authUserId })
       }
     } else {
-      this.$store.dispatch('relationshipCheck', { id: this.$route.params.id, authUserId })
-      this.$store.dispatch('loadUserProfileById', { id: this.$route.params.id })
+      this.$store.dispatch(types.ACTION_RELATIONSHIP_CHECK, { id: this.$route.params.id, authUserId })
+      this.$store.dispatch(types.ACTION_LOAD_USER_PROFILE_BY_ID_ASYNC, { id: this.$route.params.id })
     }
   },
   beforeRouteUpdate (to, from, next) {
-    this.$store.commit('setProfile', null)
+    this.$store.commit(types.SET_USER_PROFILE, null)
     if (to.params.id) {
-      this.$store.dispatch('loadUserProfileById', { id: to.params.id })
+      this.$store.dispatch(types.ACTION_LOAD_USER_PROFILE_BY_ID_ASYNC, { id: to.params.id })
     } else {
-      this.$store.dispatch('loadUserProfileById', { id: this.getUser.id })
+      this.$store.dispatch(types.ACTION_LOAD_USER_PROFILE_BY_ID_ASYNC, { id: this.getUser.id })
     }
     next()
   },
   methods: {
     onFollow () {
-      this.$store.dispatch('followUser', { id: this.id })
+      this.$store.dispatch(types.ACTION_FOLLOW_THE_USER_ASYNC, { id: this.id })
     },
     onUnfollow () {
-      this.$store.dispatch('unfollowUser', { id: this.id })
+      this.$store.dispatch(types.ACTION_UNFOLLOW_THE_USER_ASYNC, { id: this.id })
     }
   }
 }

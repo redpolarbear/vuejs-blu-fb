@@ -44,7 +44,7 @@
           @click.stop="onLogin" 
           >Login</a>
         <!-- <a class="button is-default" @click.stop="$emit('closeLogin', false)">Cancel</a> -->
-        <a class="button is-default" @click="$store.commit('toggleShowLogin', false)">Cancel</a>
+        <a class="button is-default" @click="onCancel">Cancel</a>
       </p>
   </modal>
 </template>
@@ -53,6 +53,7 @@
 import { validationMixin } from 'vuelidate'
 import { required, email } from 'vuelidate/lib/validators'
 import { mapGetters } from 'vuex'
+import * as types from '../../store/types'
 
 export default {
   name: 'login',
@@ -76,9 +77,12 @@ export default {
       }
     }
   },
-  props: [ 'showLogin' ],
+  props: ['showLogin'],
   computed: {
-    ...mapGetters(['getUser', 'getLoading']),
+    ...mapGetters({
+      getUser: types.USER,
+      getLoading: types.LOADING
+    }),
     emailErrors () {
       const errors = []
       if (!this.$v.form.email.$dirty) return errors
@@ -95,10 +99,13 @@ export default {
   },
   methods: {
     onLogin () {
-      this.$store.dispatch('signUserIn', {email: this.form.email, password: this.form.password})
+      this.$store.dispatch(types.ACTION_USER_LOGIN_ASYNC, {email: this.form.email, password: this.form.password})
+    },
+    onCancel () {
+      this.$store.commit(types.TOGGLE_LOGIN_MODAL, false)
     },
     onDismissed () {
-      this.$store.dispatch('clearError')
+      this.$store.dispatch(types.CLEAR_ERROR)
     }
   }
 }

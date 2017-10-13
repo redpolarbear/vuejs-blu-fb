@@ -26,7 +26,6 @@
 
 <script>
 import BookCardComponent from './BookCard'
-import axios from 'axios'
 
 export default {
   name: 'createbook',
@@ -40,20 +39,6 @@ export default {
     'app-book-card': BookCardComponent
   },
   methods: {
-    async searchBook () {
-      console.log(this.isbnCode)
-      const url = 'http://feedback.api.juhe.cn/ISBN'
-      const params = {
-        sub: '9787544258975',
-        key: '436d9b993fd3c3138954fd6fc9f89053'
-      }
-      const res = await axios.get(url, {
-        params,
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-      })
-      console.log(res.data.result)
-      this.bookObj = Object.assign({}, res.data.result)
-    }
   }
 }
 </script>

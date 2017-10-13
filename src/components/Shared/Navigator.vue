@@ -65,9 +65,14 @@
 </template>
 
 <script>
+// import { createNamespacedHelpers } from 'vuex'
 import { mapGetters } from 'vuex'
 import LoginComponent from '../User/Login'
 import SignupComponent from '../User/Signup'
+
+import * as types from '../../store/types'
+
+// const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
 
 export default {
   name: 'navigator',
@@ -80,7 +85,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getShowLogin', 'getShowSignup']),
+    ...mapGetters({
+      getUser: types.USER,
+      getShowLogin: types.LOGIN_MODAL,
+      getShowSignup: types.SIGNUP_MODAL
+    }),
     menuItems () {
       let menuItems = []
       if (this.userIsAuthenticated) {
@@ -99,13 +108,13 @@ export default {
   },
   methods: {
     toggleLogin () {
-      this.$store.commit('toggleShowLogin', true)
+      this.$store.commit(types.TOGGLE_LOGIN_MODAL, true)
     },
     toggleSignup () {
-      this.$store.commit('toggleShowSignup', true)
+      this.$store.commit(types.TOGGLE_SIGNUP_MODAL, true)
     },
     onLogout () {
-      this.$store.dispatch('logout')
+      this.$store.dispatch(types.ACTION_USER_LOGOUT)
     }
   }
 }
