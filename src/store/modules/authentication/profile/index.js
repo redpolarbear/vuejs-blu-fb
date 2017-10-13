@@ -28,6 +28,8 @@ const mutations = {
 
 const actions = {
   async LOAD_USER_INFO_ASYNC ({commit}, id) {
+    commit(types.SET_LOADING, true, { root: true })
+    commit(types.CLEAR_ERROR, null, { root: true })
     try {
       // load the profile
       const userProfile = firebase.database().ref('usersProfile/' + id).once('value')
@@ -39,9 +41,11 @@ const actions = {
       commit('SET_USER_INFO', values[0].val() ? {...(Object.assign({}, values[0].val())),
         followingsNo: values[1].numChildren() || 0,
         followersNo: values[2].numChildren() || 0} : null)
+      commit(types.SET_LOADING, false, { root: true })
     } catch (error) {
       // Handle Errors here.
       let errorMessage = error.message
+      commit(types.SET_LOADING, false, { root: true })
       commit(types.SET_ERROR, errorMessage, { root: true })
       console.log(error)
     }

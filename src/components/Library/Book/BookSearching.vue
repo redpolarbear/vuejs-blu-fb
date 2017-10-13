@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import * as types from '../../../store/types'
 import BookCardComponent from './BookCard'
 
 export default {
@@ -39,6 +40,9 @@ export default {
     'app-book-card': BookCardComponent
   },
   methods: {
+    searchBook () {
+      this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_ASYNC, { isbn: this.isbnCode })
+    }
   }
 }
 </script>

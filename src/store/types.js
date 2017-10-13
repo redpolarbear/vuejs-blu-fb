@@ -38,3 +38,5 @@ export const ACTION_FOLLOW_THE_USER_ASYNC = 'authentication/profile/relationship
 export const ACTION_UNFOLLOW_THE_USER_ASYNC = 'authentication/profile/relationship/UNFOLLOW_THE_USER_ASYNC'
 export const ACTION_RELATIONSHIP_CHECK = 'authentication/profile/relationship/RELATIONSHIP_CHECK'
 
+export const ACTION_SEARCH_BOOK_BY_ISBN_ASYNC = 'library/book/SEARCH_BOOK_BY_ISBN_ASYNC'
+
