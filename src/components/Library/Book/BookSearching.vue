@@ -15,7 +15,9 @@
         </a>
       </p>
       <p class="has-text-centered">
-        <a class="button is-primary is-large" @click.stop="searchBook">
+        <a class="button is-primary is-large" 
+          @click.stop="searchBook"
+          v-bind:class="[{ 'is-loading': getLoading }]">
           Search
         </a>
       </p>
@@ -25,8 +27,10 @@
 </template>
 
 <script>
-import * as types from '../../../store/types'
+import validator from 'validator'
+import { mapGetters } from 'vuex'
 import BookCardComponent from './BookCard'
+import * as types from '../../../store/types'
 
 export default {
   name: 'createbook',
@@ -36,12 +40,39 @@ export default {
       bookObj: {}
     }
   },
+  computed: {
+    ...mapGetters({
+      getBookInfo: types.BOOK_INFO,
+      getLoading: types.LOADING
+    })
+  },
   components: {
     'app-book-card': BookCardComponent
   },
+  beforeRouteLeave (to, from, next) {
+    // called when the route that renders this component is about to
+    // be navigated away from.
+    // has access to `this` component instance.
+    this.$store.commit(types.SET_BOOK_INFO, null)
+    next()
+  },
   methods: {
-    searchBook () {
-      this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_ASYNC, { isbn: this.isbnCode })
+    async searchBook () {
+      if (typeof (this.isbnCode) !== undefined && validator.isISBN(this.isbnCode)) {
+        await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC, { isbn: this.isbnCode })
+        console.log(this.getBookInfo)
+        if (this.getBookInfo) {
+          return // the book is found in the FB DB
+        } else {
+          await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_ASYNC, { isbn: this.isbnCode })
+          if (this.getBookInfo) {
+            // the book is found in the JUHE API and need to save to the FB DB
+            await this.$store.dispatch(types.ACTION_SAVE_BOOK_INFO_INTO_FB_ASYNC)
+          } else {
+            return // unable to be found
+          }
+        }
+      }
     }
   }
 }

@@ -1,28 +1,28 @@
 <template>
-  <div class="boards">
+  <!-- <div class="boards">
     <div class="columns is-centered">
       <div class="column is-half board">
         <div class="outside-box is-gray">
-          <div class="head">
+          <div class="head"> -->
             <!-- <div class="name">{{book.title}}</div> -->
             <!-- <div class="count">1</div> -->
             <!-- <div class="options"> -->
-              <a class="delete">
+              <!-- <a class="delete"> -->
                 <!-- <i class="fa fa-ellipsis-h"></i> -->
-              </a>
+              <!-- </a> -->
             <!-- </div> -->
-          </div>
+          <!-- </div>
           <div class="items">
             <div class="inside-box">
               <div class="columns">
                 <div class="column is-narrow">
-                  <!-- <img class="image" src="https://placehold.it/176x256"> -->
-                  <img class="image" :src="book.images_medium" style="width: 152px">
-                </div>
-                <div class="column">
+                   <img class="image" src="https://placehold.it/176x256"> -->
+                  <!-- <img class="image" :src="book.images_medium" style="width: 152px">
+                </div> -->
+                <!-- <div class="column"> -->
                   <!-- <h6 class="title is-6">Title: </h6> -->
                   <!-- <h6 class="subtitle is-6">Harry potter</h6> -->
-                  <div class="control is-horizontal">
+                  <!-- <div class="control is-horizontal">
                     <div class="control-label">
                       <label class="label subtitle">Title</label>
                     </div>
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script>

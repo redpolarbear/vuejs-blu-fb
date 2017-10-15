@@ -11,6 +11,8 @@ export const USER_PROFILE = 'authentication/profile/GET_USER_PROFILE'
 
 export const IS_FOLLOWING = 'authentication/profile/relationship/GET_IS_FOLLOWING'
 
+export const BOOK_INFO = 'library/book/GET_BOOK_INFO'
+
 // Mutations
 export const SET_LOADING = 'shared/SET_LOADING'
 export const SET_ERROR = 'shared/SET_ERROR'
@@ -24,6 +26,8 @@ export const SET_USER_INFO = 'authentication/profile/SET_USER_INFO'
 export const SET_USER_PROFILE = 'authentication/profile/SET_USER_PROFILE'
 
 export const SET_IS_FOLLOWING = 'authentication/profile/relationship/SET_IS_FOLLOWING'
+
+export const SET_BOOK_INFO = 'library/book/SET_BOOK_INFO'
 
 // Actions
 export const ACTION_USER_LOGIN_ASYNC = 'authentication/USER_LOGIN'
@@ -39,4 +43,5 @@ export const ACTION_UNFOLLOW_THE_USER_ASYNC = 'authentication/profile/relationsh
 export const ACTION_RELATIONSHIP_CHECK = 'authentication/profile/relationship/RELATIONSHIP_CHECK'
 
 export const ACTION_SEARCH_BOOK_BY_ISBN_ASYNC = 'library/book/SEARCH_BOOK_BY_ISBN_ASYNC'
-
+export const ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC = 'library/book/SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC'
+export const ACTION_SAVE_BOOK_INFO_INTO_FB_ASYNC = 'library/book/SAVE_BOOK_INFO_INTO_FB_ASYNC'

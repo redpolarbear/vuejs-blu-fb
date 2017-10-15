@@ -10,11 +10,17 @@ const getters = {
   GET_BOOK_INFO: (state) => {
     return state.bookInfo
   }
+  // GET_BOOK_INFO_UID: (state) => {
+  //   return state.bookInfo.uid
+  // }
 }
 
 const mutations = {
   SET_BOOK_INFO (state, payload) {
     state.bookInfo = payload
+  },
+  SET_BOOK_INFO_UID (state, payload) {
+    state.bookInfo.uid = payload.uid
   }
 }
 
@@ -29,7 +35,7 @@ const actions = {
       child = 'isbn13'
     }
     try {
-      const bookSnapshot = await firebase.database().ref('book').orderByChild(child).equalTo(payload.isbn).once('value')
+      const bookSnapshot = await firebase.database().ref('books').orderByChild(child).equalTo(payload.isbn).once('value')
       if (bookSnapshot.val()) {
         bookSnapshot.forEach(childSnapshot => {
           commit('SET_BOOK_INFO', Object.assign({}, childSnapshot.val()))
@@ -103,16 +109,21 @@ const actions = {
   async SAVE_BOOK_INFO_INTO_FB_ASYNC ({getters, commit}) {
     commit(types.SET_LOADING, true, { root: true })
     commit(types.CLEAR_ERROR, null, { root: true })
-    let newBookKey = firebase.database().ref('book').push().key
+    let newBookKey = firebase.database().ref('books').push().key
+    commit('SET_BOOK_INFO_UID', { uid: newBookKey })
     let newBookInfo = {}
-    newBookInfo[newBookKey] = {
-      uid: newBookKey,
-      ...getters('GET_BOOK_INFO')
-    }
+    newBookInfo[newBookKey] = getters['GET_BOOK_INFO']
     try {
-      
+      await firebase.database().ref('books').update(newBookInfo)
+      commit(types.SET_LOADING, false, { root: true })
     } catch (error) {
-      
+      // Handle Errors here.
+      // let errorCode = error.code
+      let errorMessage = error.message
+      // [START_EXCLUDE]
+      commit(types.SET_LOADING, false, { root: true })
+      commit(types.SET_ERROR, errorMessage, { root: true })
+      console.log(error)
     }
   }
 }
