@@ -27,7 +27,7 @@ const mutations = {
 const actions = {
   async SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC ({commit}, payload) { // payload = { isbn: isbn } - validated
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     let child = ''
     if (payload.isbn.length === 10) {
       child = 'isbn10'
@@ -57,7 +57,7 @@ const actions = {
   },
   async SEARCH_BOOK_BY_ISBN_ASYNC ({commit}, payload) { // payload = { isbn: isbn } - validated
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     const url = 'http://feedback.api.juhe.cn/ISBN'
     const params = {
       sub: payload.isbn,
@@ -108,7 +108,7 @@ const actions = {
   },
   async SAVE_BOOK_INFO_INTO_FB_ASYNC ({getters, commit}) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     let newBookKey = firebase.database().ref('books').push().key
     commit('SET_BOOK_INFO_UID', { uid: newBookKey })
     let newBookInfo = {}

@@ -36,7 +36,7 @@ const mutations = {
 const actions = {
   async USER_SIGNUP ({commit, dispatch, rootGetters}, payload) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     try {
       const newUser = await firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
       await newUser.updateProfile({
@@ -58,13 +58,26 @@ const actions = {
       }
       commit(types.SET_LOADING, false, { root: true })
       commit('TOGGLE_SIGNUP_MODAL', false)
+      const successMessage = 'Signup Successfully'
+      commit(types.SET_SUCCESS, successMessage, { root: true })
     } catch (error) {
       // Handle Errors here.
-      var errorCode = error.code
-      var errorMessage = error.message
+      let errorCode = error.code
+      let errorMessage = error.message
       // [START_EXCLUDE]
-      if (errorCode === 'auth/weak-password') {
-        errorMessage = 'The password is too weak.'
+      switch (errorCode) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'The email is already in use.'
+          break
+        case 'auth/invalid-email':
+          errorMessage = 'The email address is not valid.'
+          break
+        case 'auth/weak-password':
+          errorMessage = 'The password is not strong enough.'
+          break
+        default:
+          errorMessage = 'Unknown error occurred.'
+          break
       }
       commit(types.SET_LOADING, false, { root: true })
       commit('TOGGLE_SIGNUP_MODAL', false)
@@ -74,7 +87,7 @@ const actions = {
   },
   async USER_LOGIN ({commit, dispatch, rootGetters}, payload) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     try {
       const user = await firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
       if (user) {
@@ -84,13 +97,29 @@ const actions = {
       }
       commit(types.SET_LOADING, false, { root: true })
       commit('TOGGLE_LOGIN_MODAL', false)
+      const successMessage = 'Login Successfully'
+      commit(types.SET_SUCCESS, successMessage, { root: true })
     } catch (error) {
       // Handle Errors here.
       let errorCode = error.code
       let errorMessage = error.message
       // [START_EXCLUDE]
-      if (errorCode === 'auth/wrong-password') {
-        errorMessage = 'Wrong password.'
+      switch (errorCode) {
+        case 'auth/user-disabled':
+          errorMessage = 'The user has been disabled.'
+          break
+        case 'auth/invalid-email':
+          errorMessage = 'The email address is not valid.'
+          break
+        case 'auth/user-not-found':
+          errorMessage = 'The user is not found or the password is incorrect.'
+          break
+        case 'auth/wrong-password':
+          errorMessage = 'The user is not found or the password is incorrect.'
+          break
+        default:
+          errorMessage = 'Unknown error occurred.'
+          break
       }
       commit(types.SET_LOADING, false, { root: true })
       commit('TOGGLE_LOGIN_MODAL', false)
@@ -100,7 +129,6 @@ const actions = {
   },
   async AUTO_SIGNIN ({commit, dispatch, rootGetters}, payload) {
     await dispatch(types.ACTION_LOAD_USER_INFO_ASYNC, payload.displayName, { root: true })
-    // commit(types.SET_USER, state.userInfo)
     commit('SET_USER', rootGetters[types.USER_INFO])
   },
   USER_LOGOUT ({commit}) {
@@ -108,6 +136,8 @@ const actions = {
     commit('SET_USER', null)
     commit(types.SET_USER_PROFILE, null, { root: true })
     commit(types.SET_USER_INFO, null, { root: true })
+    const successMessage = 'Logout Successfully'
+    commit(types.SET_SUCCESS, successMessage, { root: true })
   }
 }
 

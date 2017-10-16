@@ -81,7 +81,8 @@ export default {
   computed: {
     ...mapGetters({
       getUser: types.USER,
-      getLoading: types.LOADING
+      getLoading: types.LOADING,
+      getError: types.ERROR
     }),
     emailErrors () {
       const errors = []

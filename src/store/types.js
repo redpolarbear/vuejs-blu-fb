@@ -1,6 +1,8 @@
 // Getters
 export const LOADING = 'shared/GET_LOADING'
 export const ERROR = 'shared/GET_ERROR'
+export const SUCCESS = 'shared/GET_SUCCESS'
+export const INFO = 'shared/GET_INFO'
 
 export const USER = 'authentication/GET_USER'
 export const LOGIN_MODAL = 'authentication/GET_LOGIN_MODAL'
@@ -16,7 +18,10 @@ export const BOOK_INFO = 'library/book/GET_BOOK_INFO'
 // Mutations
 export const SET_LOADING = 'shared/SET_LOADING'
 export const SET_ERROR = 'shared/SET_ERROR'
+export const SET_SUCCESS = 'shared/SET_SUCCESS'
+export const SET_INFO = 'shared/SET_INFO'
 export const CLEAR_ERROR = 'shared/CLEAR_ERROR'
+export const CLEAR_ALL_MESSAGE = 'shared/CLEAR_ALL_MESSAGE'
 
 export const SET_USER = 'authentication/SET_USER'
 export const TOGGLE_LOGIN_MODAL = 'authentication/TOGGLE_LOGIN_MODAL'

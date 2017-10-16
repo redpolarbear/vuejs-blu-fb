@@ -21,7 +21,7 @@ const mutations = {
 const actions = {
   async FOLLOW_THE_USER_ASYNC ({commit, rootGetters}, payload) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     // check the payload.id is valid
     if (shortid.isValid(payload.id)) {
       try {
@@ -45,7 +45,7 @@ const actions = {
   },
   async UNFOLLOW_THE_USER_ASYNC ({commit, rootGetters}, payload) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     // check the payload.id is valid
     if (shortid.isValid(payload.id)) {
       try {

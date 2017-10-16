@@ -1,4 +1,5 @@
 <template>
+  <div></div>
   <!-- <div class="boards">
     <div class="columns is-centered">
       <div class="column is-half board">

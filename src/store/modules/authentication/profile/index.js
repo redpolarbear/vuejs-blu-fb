@@ -29,7 +29,7 @@ const mutations = {
 const actions = {
   async LOAD_USER_INFO_ASYNC ({commit}, id) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     try {
       // load the profile
       const userProfile = firebase.database().ref('usersProfile/' + id).once('value')
@@ -52,7 +52,7 @@ const actions = {
   },
   async LOAD_USER_PROFILE_BY_ID_ASYNC ({state, commit, dispatch}, payload) {
     commit(types.SET_LOADING, true, { root: true })
-    commit(types.CLEAR_ERROR, null, { root: true })
+    commit(types.CLEAR_ALL_MESSAGE, null, { root: true })
     try {
       if (shortid.isValid(payload.id)) {
         // if the payload.id is valid, load the profile of the user whose profile page is being visited, setup the userId = payload.id
