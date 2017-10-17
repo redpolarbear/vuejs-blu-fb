@@ -21,7 +21,7 @@
           Search
         </a>
       </p>
-      <app-book-card></app-book-card>
+      <app-book-card :book="getBookInfo" ></app-book-card>
     </div>
   </section>
 </template>
@@ -72,6 +72,8 @@ export default {
             return // unable to be found
           }
         }
+      } else {
+        this.$store.commit(types.SET_ERROR, 'Please input the valid ISBN.')
       }
     }
   }

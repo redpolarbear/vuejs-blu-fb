@@ -1,82 +1,84 @@
 <template>
-  <div></div>
-  <!-- <div class="boards">
-    <div class="columns is-centered">
-      <div class="column is-half board">
-        <div class="outside-box is-gray">
-          <div class="head"> -->
-            <!-- <div class="name">{{book.title}}</div> -->
-            <!-- <div class="count">1</div> -->
-            <!-- <div class="options"> -->
-              <!-- <a class="delete"> -->
-                <!-- <i class="fa fa-ellipsis-h"></i> -->
-              <!-- </a> -->
-            <!-- </div> -->
-          <!-- </div>
-          <div class="items">
-            <div class="inside-box">
-              <div class="columns">
-                <div class="column is-narrow">
-                   <img class="image" src="https://placehold.it/176x256"> -->
-                  <!-- <img class="image" :src="book.images_medium" style="width: 152px">
-                </div> -->
-                <!-- <div class="column"> -->
-                  <!-- <h6 class="title is-6">Title: </h6> -->
-                  <!-- <h6 class="subtitle is-6">Harry potter</h6> -->
-                  <!-- <div class="control is-horizontal">
-                    <div class="control-label">
-                      <label class="label subtitle">Title</label>
-                    </div>
-                    <div class="control is-grouped">
-                      <p class="control is-expanded">
-                        <input class="input form-control-plaintext" type="text" readonly :value="book.title">
-                      </p>
-                    </div>
-                  </div>
-                  <div class="control is-horizontal">
-                    <div class="control-label">
-                      <label class="label subtitle">Author</label>
-                    </div>
-                    <div class="control is-grouped">
-                      <p class="control is-expanded">
-                        <input class="input form-control-plaintext" type="text" readonly :value="book.author">
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
+  <div v-if="book">
+    <p>
+      <img :src="book.images_large" alt="">
+    </p>
+    <p>{{ book.title }}</p>
+    <p>{{ book.subtitle }}</p>
+    <p>{{ book.author }}</p>
+    <p>{{ book.translator }}</p>
+    <p>{{ book.pages }}</p>
+    <p>{{ book.pubdate }}</p>
+    <p>{{ book.publisher }}</p>
+    <p>{{ book.isbn10 }}</p>
+    <p>{{ book.isbn13 }}</p>
+    <p>{{ summary }}</p>
+    <a class="button">
+      <span class="icon">
+        <i class="fa fa-plus"></i>
+      </span>
+      <span>Add</span>
+    </a>
+    <a class="button">
+      <span class="icon">
+        <i class="fa fa-heart-o"></i>
+      </span>
+      <span>Favourite</span>
+    </a>
+    <a class="button">
+      <span class="icon">
+        <i class="fa fa-info-circle"></i>
+      </span>
+      <span>Information</span>
+    </a>
+    <a class="button">
+      <span class="icon">
+        <i class="fa fa-tags"></i>
+      </span>
+      <span>Tags</span>
+    </a>
+    <a class="button">
+      <span class="icon">
+        <i class="fa fa-gift"></i>
+      </span>
+      <span>Wish List</span>
+    </a>
+
+
+  </div>
 </template>
 
 <script>
+import he from 'he'
+
 export default {
   name: 'bookcard',
-  // props: [ 'book' ],
+  props: [ 'book' ],
   data () {
     return {
-      book: {
-        author: '[哥伦比亚] 加西亚·马尔克斯',
-        binding: '精装',
-        images_large: 'http://open.6api.net/lpic/s11284102.jpg',
-        images_medium: 'http://open.6api.net/mpic/s11284102.jpg',
-        isbn10: '7544258971',
-        isbn13: '9787544258975',
-        levelNum: '9',
-        origin_title: '',
-        pages: '401',
-        price: '39.50',
-        pubdate: '2012-9-1',
-        publisher: '南海出版公司',
-        subtitle: '',
-        summary: '★马尔克斯唯一正式授权，首次完整翻译↵★《霍乱时期的爱情》是我最好的作品，是我发自内心的创作。——加西亚•马尔克斯↵★这部光芒闪耀、令人心碎的作品是人类有史以来最伟大的爱情小说。——《纽约时报》↵《霍乱时期的爱情》是加西亚•马尔克斯获得诺贝尔文学奖之后完成的第一部小说。讲述了一段跨越半个多世纪的爱情史诗，穷尽了所有爱情的可能性：忠贞的、隐秘的、粗暴的、羞怯的、柏拉图式的、放荡的、转瞬即逝的、生死相依的……再现了时光的无情流逝，被誉为“人类有史以来最伟大的爱情小说”，是20世纪最重要的经典文学巨著之一。',
-        title: '霍乱时期的爱情',
-        translator: '杨玲'
-      }
+      // book: {
+      //   author: '[哥伦比亚] 加西亚·马尔克斯',
+      //   binding: '精装',
+      //   images_large: 'http://open.6api.net/lpic/s11284102.jpg',
+      //   images_medium: 'http://open.6api.net/mpic/s11284102.jpg',
+      //   isbn10: '7544258971',
+      //   isbn13: '9787544258975',
+      //   levelNum: '9',
+      //   origin_title: '',
+      //   pages: '401',
+      //   price: '39.50',
+      //   pubdate: '2012-9-1',
+      //   publisher: '南海出版公司',
+      //   subtitle: '',
+      //   summary: '★马尔克斯唯一正式授权，首次完整翻译↵★《霍乱时期的爱情》是我最好的作品，是我发自内心的创作。——加西亚•马尔克斯↵★这部光芒闪耀、令人心碎的作品是人类有史以来最伟大的爱情小说。——《纽约时报》↵《霍乱时期的爱情》是加西亚•马尔克斯获得诺贝尔文学奖之后完成的第一部小说。讲述了一段跨越半个多世纪的爱情史诗，穷尽了所有爱情的可能性：忠贞的、隐秘的、粗暴的、羞怯的、柏拉图式的、放荡的、转瞬即逝的、生死相依的……再现了时光的无情流逝，被誉为“人类有史以来最伟大的爱情小说”，是20世纪最重要的经典文学巨著之一。',
+      //   title: '霍乱时期的爱情',
+      //   translator: '杨玲'
+      // }
+    }
+  },
+  computed: {
+    summary () {
+      return he.decode(this.book.summary)
     }
   }
 }

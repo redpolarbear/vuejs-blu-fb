@@ -33,6 +33,12 @@ const mutations = {
   SET_INFO (state, payload) {
     state.info = payload
   },
+  CLEAR_SUCCESS (state) {
+    state.success = null
+  },
+  CLEAR_INFO (state) {
+    state.info = null
+  },
   CLEAR_ERROR (state) {
     state.error = null
   },

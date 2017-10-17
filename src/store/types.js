@@ -20,6 +20,8 @@ export const SET_LOADING = 'shared/SET_LOADING'
 export const SET_ERROR = 'shared/SET_ERROR'
 export const SET_SUCCESS = 'shared/SET_SUCCESS'
 export const SET_INFO = 'shared/SET_INFO'
+export const CLEAR_SUCCESS = 'shared/CLEAR_SUCCESS'
+export const CLEAR_INFO = 'shared/CLEAR_INFO'
 export const CLEAR_ERROR = 'shared/CLEAR_ERROR'
 export const CLEAR_ALL_MESSAGE = 'shared/CLEAR_ALL_MESSAGE'
 

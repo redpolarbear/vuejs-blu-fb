@@ -113,11 +113,13 @@ export default {
       if (errorMessage) {
         this.$notify.open({
           content: errorMessage,
-          placement: 'top-center',
-          transition: 'slideDown',
+          placement: 'bottom-center',
+          transition: 'slideUp',
           type: 'danger',
-          duration: 2000
+          duration: 2500
+          // closable: false
         })
+        this.$store.commit(types.CLEAR_ERROR)
       }
     },
     getSuccess: function (successMessage) {
@@ -127,8 +129,10 @@ export default {
           placement: 'top-center',
           transition: 'slideDown',
           type: 'success',
-          duration: 2000
+          duration: 2500
+          // closable: false
         })
+        this.$store.commit(types.CLEAR_SUCCESS)
       }
     },
     getInfo: function (infoMessage) {
@@ -137,9 +141,11 @@ export default {
           content: infoMessage,
           placement: 'top-center',
           transition: 'slideDown',
-          type: 'primary',
-          duration: 2000
+          type: 'warning',
+          duration: 2500
+          // closable: false
         })
+        this.$store.commit(types.CLEAR_INFO)
       }
     }
   },
