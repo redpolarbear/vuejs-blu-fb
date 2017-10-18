@@ -2,7 +2,6 @@
   <modal
     :backdrop-closable="false" 
     :is-show="showSignup" 
-    @close="$emit('closeSignup', false)"
     :width="420">
       <p class="title" slot="header">Register an Account</p>
       <div class="box">

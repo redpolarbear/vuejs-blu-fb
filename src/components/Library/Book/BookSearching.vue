@@ -36,7 +36,7 @@ export default {
   name: 'createbook',
   data () {
     return {
-      isbnCode: '',
+      isbnCode: '7544258971',
       bookObj: {}
     }
   },

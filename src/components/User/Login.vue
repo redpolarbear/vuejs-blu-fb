@@ -2,7 +2,6 @@
   <modal
     :backdrop-closable="false" 
     :is-show="showLogin" 
-    @close="$emit('closeLogin', false)"
     :width="420">
       <p class="title" slot="header">Login</p>
       <div class="box">
