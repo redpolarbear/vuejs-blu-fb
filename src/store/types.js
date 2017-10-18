@@ -15,6 +15,8 @@ export const IS_FOLLOWING = 'authentication/profile/relationship/GET_IS_FOLLOWIN
 
 export const BOOK_INFO = 'library/book/GET_BOOK_INFO'
 
+export const COLLECTIONS = 'library/collection/GET_COLLECTIONS'
+
 // Mutations
 export const SET_LOADING = 'shared/SET_LOADING'
 export const SET_ERROR = 'shared/SET_ERROR'
@@ -52,3 +54,5 @@ export const ACTION_RELATIONSHIP_CHECK = 'authentication/profile/relationship/RE
 export const ACTION_SEARCH_BOOK_BY_ISBN_ASYNC = 'library/book/SEARCH_BOOK_BY_ISBN_ASYNC'
 export const ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC = 'library/book/SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC'
 export const ACTION_SAVE_BOOK_INFO_INTO_FB_ASYNC = 'library/book/SAVE_BOOK_INFO_INTO_FB_ASYNC'
+
+export const ACTION_LOAD_COLLECTIONS_ASYNC = 'library/collection/LOAD_COLLECTIONS_ASYNC'

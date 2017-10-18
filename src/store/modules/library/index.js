@@ -1,4 +1,5 @@
 import book from './book'
+import collection from './collection'
 
 const state = {
 
@@ -25,6 +26,10 @@ export default {
     book: {
       namespaced: true,
       ...book
+    },
+    collection: {
+      namespaced: true,
+      ...collection
     }
   }
 }

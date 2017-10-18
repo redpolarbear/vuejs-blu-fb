@@ -76,7 +76,7 @@ export default {
       }
     }
   },
-  props: ['showLogin'],
+  props: [ 'showLogin' ],
   computed: {
     ...mapGetters({
       getUser: types.USER,
