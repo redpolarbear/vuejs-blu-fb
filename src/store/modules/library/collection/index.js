@@ -31,6 +31,7 @@ const mutations = {
   // },
   ADD_ONE_EMPTY_COLLECTION (state) {
     state.collections.push({
+      booksNo: 0,
       collection: { name: '' },
       isChecked: false,
       isEditing: true,
@@ -81,7 +82,7 @@ const actions = {
   async LOAD_COLLECTIONS_ASYNC ({commit, rootGetters}) { // TODO: try..catch...
     try {
       const usersCollections = await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id).once('value')
-      let usersCollectionsArray = Object.entries(usersCollections.val()).map(e => Object.assign({isEditing: false, isExisted: false, isChecked: false, isLoading: false}, {collection: {...e[1], booksNo: e[1].books === null ? 0 : _.size(e[1].books)}}))
+      let usersCollectionsArray = Object.entries(usersCollections.val()).map(e => Object.assign({isEditing: false, isExisted: false, isChecked: false, isLoading: false, booksNo: e[1].books === null ? 0 : _.size(e[1].books)}, {collection: e[1]}))
       // let arr = Object.entries(usersCollections).map(e => Object.assign(e[1], { key: e[0] }))
       commit('SET_COLLECTIONS', usersCollectionsArray)
       // commit('SET_COLLECTIONS', Object.assign({}, usersCollections.val()))
@@ -92,7 +93,7 @@ const actions = {
     commit('ENABLE_COLLECTION_LOADING', { index: payload.index })
     let collectionKey = ''
     let collection = {}
-    if (payload.collection.uid) {
+    if (payload.collection.uid) { // modify the name of the collection
       collectionKey = payload.collection.uid
       collection[collectionKey] = {
         ...payload.collection,
@@ -109,6 +110,7 @@ const actions = {
     }
     await firebase.database().ref('userCollectionsBooks').child(rootGetters[types.USER].id).update(collection)
     commit('UPDATE_ONE_COLLECTION', {
+      booksNo: payload.booksNo,
       collection: collection[collectionKey],
       index: payload.index,
       isChecked: false,
@@ -130,8 +132,7 @@ const actions = {
       const collectionBooksArray = Object.entries(collectionBooks.val()).map(e => Object.assign({}, e[1]))
       const newBook = rootGetters[types.BOOK_INFO]
       const isExisted = collectionBooksArray.find(e => newBook.isbn10 === e.isbn10 || newBook.isbn13 === e.isbn13)
-      if (isExisted !== undefined || isExisted !== null) {
-        console.log('repeated')
+      if (isExisted !== undefined) {
         const infoMessage = 'You have already got this book.'
         commit(types.SET_INFO, infoMessage, { root: true })
         return

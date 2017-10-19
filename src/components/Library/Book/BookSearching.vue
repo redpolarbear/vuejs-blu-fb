@@ -58,13 +58,13 @@ export default {
   },
   methods: {
     async searchBook () {
-      if (typeof (this.isbnCode) !== undefined && validator.isISBN(this.isbnCode)) {
-        await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC, { isbn: this.isbnCode })
+      if (typeof (this.isbnCode.trim()) !== undefined && validator.isISBN(this.isbnCode.trim())) {
+        await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC, { isbn: this.isbnCode.trim() })
         console.log(this.getBookInfo)
         if (this.getBookInfo) {
           return // the book is found in the FB DB
         } else {
-          await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_ASYNC, { isbn: this.isbnCode })
+          await this.$store.dispatch(types.ACTION_SEARCH_BOOK_BY_ISBN_ASYNC, { isbn: this.isbnCode.trim() })
           if (this.getBookInfo) {
             // the book is found in the JUHE API and need to save to the FB DB
             await this.$store.dispatch(types.ACTION_SAVE_BOOK_INFO_INTO_FB_ASYNC)

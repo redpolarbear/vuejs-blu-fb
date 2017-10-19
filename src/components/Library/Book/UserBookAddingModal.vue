@@ -44,7 +44,7 @@
             <span class="help is-danger" v-if="item.isExisted">The Collection has been existed.</span>
             <!-- v-on:blur="item.isEditing ? completeEditing(item, index) : null" -->
         </p>
-        <p v-if="!item.isEditing">{{ item.collection.booksNo }} Book(s)</p>
+        <p v-if="!item.isEditing">{{ item.booksNo }} Book(s)</p>
       </div>
       <div class="column is-3 is-pulled-right" v-if="!item.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
         <p class="control has-addons collection-buttons-group">
@@ -53,7 +53,7 @@
               <i class="fa fa-edit"></i>
             </span>
           </a>
-          <a class="button is-danger is-inverted" @click="trashCollection(item.collection.uid, index)">
+          <a class="button is-danger is-inverted" @click="trashCollection(item, index)">
             <span class="icon">
               <i class="fa fa-trash"></i>
             </span>
@@ -208,6 +208,7 @@ export default {
         isExisted === -1 ? item.isExisted = false : item.isExisted = true
         if (!item.isExisted) {
           this.$store.dispatch(types.ACTION_SAVE_ONE_COLLECTION_INTO_FB, {
+            booksNo: item.booksNo,
             collection: item.collection,
             index,
             isChecked: false,
@@ -229,9 +230,13 @@ export default {
       // this.$store.commit(types.SET_ADDING_LOCK, !this.getAddingLock)
       this.addingLock = true
     },
-    trashCollection (uid, index) {
-      // this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
-      this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid } })
+    trashCollection (item, index) {
+      if (item.booksNo !== 0) {
+        const infoMessage = 'The collection is not empty.'
+        this.$store.commit(types.SET_INFO, infoMessage)
+      } else if (item.booksNo === 0) {
+        this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid: item.collection.uid } })
+      }
     },
     checkCollection (item, index) {
       if (this.checkedIndex !== null && this.checkedIndex === index) {

@@ -22,7 +22,7 @@
     </a>
     <app-user-book-adding :showAddingModal="showAddingModal" @showAddingModal="showAddingModal=$event"></app-user-book-adding>
 
-    <a class="button">
+    <a class="button is-danger">
       <span class="icon">
         <i class="fa fa-heart-o"></i>
       </span>
@@ -40,7 +40,7 @@
       </span>
       <span>Tags</span>
     </a>
-    <a class="button">
+    <a class="button is-primary">
       <span class="icon">
         <i class="fa fa-gift"></i>
       </span>
