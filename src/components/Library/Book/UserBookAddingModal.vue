@@ -10,7 +10,7 @@
         <p class="title">Your Collections</p>
       </div>
       <div class="is-pulled-right">
-        <a class="button is-small is-white" @click="addNewCollection" :disabled="getAddingLock">
+        <a class="button is-small is-white" @click="addNewCollection" :disabled="isAddingLocked">
           <span class="icon is-small">
             <i class="fa fa-plus-circle"></i>
           </span>
@@ -21,17 +21,18 @@
 
     <div class="columns" v-for="(item, index) in getCollections" :key="index">
       <div class="column is-1 has-text-centered collection-check">
-        <a class="button is-large is-white collection-check-button">
+        <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': item.isExisted || item.isEditing }" @click="checkCollection(item, index)">
           <span class="icon is-large collection-check-button-icon">
-            <i class="fa fa-folder-o"></i>
+            <i class="fa fa-folder-o" v-if="!item.isChecked"></i>
+            <i class="fa fa-folder-open-o" v-else></i>
           </span>
         </a>
       </div>
       <div class="column collection-name">
-        <p class="control">
+        <p class="control" v-bind:class="{ 'is-loading': item.isLoading }">
           <input 
             class="input" 
-            v-bind:class="{ 'is-static': !item.isEditing }" 
+            v-bind:class="{ 'is-static': !item.isEditing, 'is-danger': item.isExisted }" 
             :readonly="!item.isEditing" 
             :placeholder="item.isEditing ? 'collection name' : false"
             @focus="$event.target.select()"
@@ -39,6 +40,8 @@
             type="text" 
             v-focus
             v-model="item.collection.name">
+            <span class="help is-danger" v-if="item.isExisted">The Collection has been existed.</span>
+            <!-- v-on:blur="item.isEditing ? completeEditing(item, index) : null" -->
         </p>
         <p v-if="!item.isEditing">0 Books</p>
       </div>
@@ -153,15 +156,13 @@
         </p>          
       </div>
     </div> -->
-
-
-
   </modal>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import * as types from '../../../store/types'
+import _ from 'lodash'
 
 const focus = {
   inserted (el) {
@@ -175,42 +176,68 @@ export default {
   directives: { focus },
   computed: {
     ...mapGetters({
-      getCollections: types.COLLECTIONS,
-      getAddingLock: types.ADDING_LOCK
-    })
+      getCollections: types.COLLECTIONS
+      // getAddingLock: types.ADDING_LOCK
+    }),
+    isAddingLocked: function () {
+      return this.addingLock
+    }
   },
   data () {
     return {
+      addingLock: false,
+      checkedIndex: null
     }
   },
   methods: {
     closeModal () {
       this.$emit('showAddingModal', false)
-      this.$store.commit(types.SET_ADDING_LOCK, false)
+      // this.$store.commit(types.SET_ADDING_LOCK, false)
+      this.addingLock = false
+      this.checkedIndex = null
     },
     addNewCollection () {
       this.$store.commit(types.ADD_ONE_EMPTY_COLLECTION)
-      this.$store.commit(types.SET_ADDING_LOCK, true)
+      // this.$store.commit(types.SET_ADDING_LOCK, true)
+      this.addingLock = true
     },
     completeEditing (item, index) {
-      if (item.collection.name) {
-        this.$store.dispatch(types.ACTION_SAVE_ONE_COLLECTION_INTO_FB, {
-          collection: item.collection,
-          index,
-          isEditing: false
-        })
+      if (item.collection.name.trim()) {
+        const isExisted = _.findIndex(this.getCollections.filter((e, indx) => indx !== index), e => e.collection.name.trim() === item.collection.name.trim())
+        isExisted === -1 ? item.isExisted = false : item.isExisted = true
+        if (!item.isExisted) {
+          this.$store.dispatch(types.ACTION_SAVE_ONE_COLLECTION_INTO_FB, {
+            collection: item.collection,
+            index,
+            isChecked: false,
+            isEditing: false,
+            isExisted: false,
+            isLoading: false
+          })
+        } else {
+          return
+        }
       } else {
         this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
       }
-      this.$store.commit(types.SET_ADDING_LOCK, false)
+      // this.$store.commit(types.SET_ADDING_LOCK, false)
+      this.addingLock = false
     },
     enableEdit (index) {
       this.$store.commit(types.ENABLE_COLLECTION_EDITING, { index })
-      this.$store.commit(types.SET_ADDING_LOCK, !this.getAddingLock)
+      // this.$store.commit(types.SET_ADDING_LOCK, !this.getAddingLock)
+      this.addingLock = true
     },
     trashCollection (uid, index) {
       // this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
       this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid } })
+    },
+    checkCollection (item, index) {
+      if (this.checkedIndex !== null) {
+        this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index: this.checkedIndex })
+      }
+      this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index })
+      this.checkedIndex = index
     }
   }
 }

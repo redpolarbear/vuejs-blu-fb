@@ -16,7 +16,8 @@ export const IS_FOLLOWING = 'authentication/profile/relationship/GET_IS_FOLLOWIN
 export const BOOK_INFO = 'library/book/GET_BOOK_INFO'
 
 export const COLLECTIONS = 'library/collection/GET_COLLECTIONS'
-export const ADDING_LOCK = 'library/collection/GET_ADDING_LOCK'
+// export const ADDING_LOCK = 'library/collection/GET_ADDING_LOCK'
+export const GET_COLLECTION_BY_NAME = 'library/collection/GET_COLLECTION_BY_NAME'
 
 // Mutations
 export const SET_LOADING = 'shared/SET_LOADING'
@@ -39,11 +40,12 @@ export const SET_IS_FOLLOWING = 'authentication/profile/relationship/SET_IS_FOLL
 
 export const SET_BOOK_INFO = 'library/book/SET_BOOK_INFO'
 
-export const SET_ADDING_LOCK = 'library/collection/SET_ADDING_LOCK'
+// export const SET_ADDING_LOCK = 'library/collection/SET_ADDING_LOCK'
 export const ADD_ONE_EMPTY_COLLECTION = 'library/collection/ADD_ONE_EMPTY_COLLECTION'
 export const REMOVE_ONE_COLLECTION = 'library/collection/REMOVE_ONE_COLLECTION'
 export const UPDATE_ONE_COLLECTION = 'library/collection/UPDATE_ONE_COLLECTION'
 export const ENABLE_COLLECTION_EDITING = 'library/collection/ENABLE_COLLECTION_EDITING'
+export const TOGGLE_COLLECTION_CHECK = 'library/collection/TOGGLE_COLLECTION_CHECK'
 
 // Actions
 export const ACTION_USER_LOGIN_ASYNC = 'authentication/USER_LOGIN'
