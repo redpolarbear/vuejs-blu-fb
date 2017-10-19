@@ -57,34 +57,28 @@ const actions = {
         // create four default collections - reading, read, favorite, wishlist
         const ReadingCollectionKey = firebase.database().ref('userCollectionsBooks').child(payload.id).push().key
         const ReadCollectionKey = firebase.database().ref('userCollectionsBooks').child(payload.id).push().key
-        const FavoriteCollectionKey = firebase.database().ref('userCollectionsBooks').child(payload.id).push().key
-        const WishListCollectionKey = firebase.database().ref('userCollectionsBooks').child(payload.id).push().key
         let defaultCollectionsUpdate = {}
-        defaultCollectionsUpdate[ReadingCollectionKey] = {
+        defaultCollectionsUpdate['userCollectionsBooks/' + payload.id + '/' + ReadingCollectionKey] = {
           name: 'My Reading Collection',
           uid: ReadingCollectionKey,
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         }
-        defaultCollectionsUpdate[ReadCollectionKey] = {
+        defaultCollectionsUpdate['userCollectionsBooks/' + payload.id + '/' + ReadCollectionKey] = {
           name: 'My Read Collection',
           uid: ReadCollectionKey,
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         }
-        defaultCollectionsUpdate[FavoriteCollectionKey] = {
-          name: 'My Favorites',
-          uid: FavoriteCollectionKey,
+        defaultCollectionsUpdate['userFavoriteBooks/' + payload.id] = {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         }
-        defaultCollectionsUpdate[WishListCollectionKey] = {
-          name: 'My Wish List',
-          uid: WishListCollectionKey,
+        defaultCollectionsUpdate['userWishlistBooks/' + payload.id] = {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           updatedAt: firebase.database.ServerValue.TIMESTAMP
         }
-        firebase.database().ref('userCollectionsBooks').child(payload.id).update(defaultCollectionsUpdate)
+        firebase.database().ref().update(defaultCollectionsUpdate)
         await dispatch(types.ACTION_LOAD_USER_INFO_ASYNC, payload.id, { root: true })
         commit('SET_USER', rootGetters[types.USER_INFO])
       }
