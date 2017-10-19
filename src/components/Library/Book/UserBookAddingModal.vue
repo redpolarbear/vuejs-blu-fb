@@ -3,6 +3,8 @@
     :width="520" 
     :is-show="showAddingModal" 
     transition="fadeDown"
+    :on-ok="addToCollection"
+    :on-cancel="closeModal"
     @close="closeModal"
     :backdrop-closable="false">
     <div slot="header" class="modal-header">
@@ -18,7 +20,6 @@
         </a>
       </div>
     </div>
-
     <div class="columns" v-for="(item, index) in getCollections" :key="index">
       <div class="column is-1 has-text-centered collection-check">
         <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': item.isExisted || item.isEditing }" @click="checkCollection(item, index)">
@@ -43,7 +44,7 @@
             <span class="help is-danger" v-if="item.isExisted">The Collection has been existed.</span>
             <!-- v-on:blur="item.isEditing ? completeEditing(item, index) : null" -->
         </p>
-        <p v-if="!item.isEditing">0 Books</p>
+        <p v-if="!item.isEditing">{{ item.collection.booksNo }} Book(s)</p>
       </div>
       <div class="column is-3 is-pulled-right" v-if="!item.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
         <p class="control has-addons collection-buttons-group">
@@ -233,11 +234,24 @@ export default {
       this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid } })
     },
     checkCollection (item, index) {
-      if (this.checkedIndex !== null) {
+      if (this.checkedIndex !== null && this.checkedIndex === index) {
         this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index: this.checkedIndex })
+        this.checkedIndex = null
+      } else if (this.checkedIndex !== null && this.checkedIndex !== index) {
+        this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index: this.checkedIndex })
+        this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index })
+        this.checkedIndex = index
+      } else {
+        this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index })
+        this.checkedIndex = index
       }
-      this.$store.commit(types.TOGGLE_COLLECTION_CHECK, { index })
-      this.checkedIndex = index
+    },
+    addToCollection () {
+      if (this.checkedIndex === null) {
+        this.closeModal()
+      } else {
+        this.$store.dispatch(types.ACTION_SAVE_THE_BOOK_INTO_COLLECTION_IN_FB, { checkedIndex: this.checkedIndex })
+      }
     }
   }
 }

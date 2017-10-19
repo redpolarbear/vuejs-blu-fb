@@ -81,7 +81,7 @@ const actions = {
   async LOAD_COLLECTIONS_ASYNC ({commit, rootGetters}) { // TODO: try..catch...
     try {
       const usersCollections = await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id).once('value')
-      let usersCollectionsArray = Object.entries(usersCollections.val()).map(e => Object.assign({isEditing: false, isExisted: false, isChecked: false, isLoading: false}, {collection: e[1]}))
+      let usersCollectionsArray = Object.entries(usersCollections.val()).map(e => Object.assign({isEditing: false, isExisted: false, isChecked: false, isLoading: false}, {collection: {...e[1], booksNo: e[1].books === null ? 0 : _.size(e[1].books)}}))
       // let arr = Object.entries(usersCollections).map(e => Object.assign(e[1], { key: e[0] }))
       commit('SET_COLLECTIONS', usersCollectionsArray)
       // commit('SET_COLLECTIONS', Object.assign({}, usersCollections.val()))
@@ -121,6 +121,30 @@ const actions = {
   async REMOVE_ONE_COLLECTION_FROM_FB ({commit, rootGetters}, payload) {
     await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id + '/' + payload.collection.uid).remove()
     commit('REMOVE_ONE_COLLECTION', { index: payload.index })
+  },
+  async SAVE_THE_BOOK_INTO_COLLECTION_IN_FB ({state, commit, rootGetters}, payload) {
+    const collectionUid = state.collections[payload.checkedIndex].collection.uid
+    // check if the book is existed
+    const collectionBooks = await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id + '/' + collectionUid).child('books').once('value')
+    if (collectionBooks.val()) { // already collected some books
+      const collectionBooksArray = Object.entries(collectionBooks.val()).map(e => Object.assign({}, e[1]))
+      const newBook = rootGetters[types.BOOK_INFO]
+      const isExisted = collectionBooksArray.find(e => newBook.isbn10 === e.isbn10 || newBook.isbn13 === e.isbn13)
+      if (isExisted !== undefined || isExisted !== null) {
+        console.log('repeated')
+        const infoMessage = 'You have already got this book.'
+        commit(types.SET_INFO, infoMessage, { root: true })
+        return
+      }
+    }
+     // the collection is empty or never collect this book into this collection
+    let update = {}
+    const updateKey = firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id + '/' + collectionUid).child('books').push().key
+    update['userCollectionsBooks/' + rootGetters[types.USER].id + '/' + collectionUid + '/books/' + updateKey] = rootGetters[types.BOOK_INFO]
+    await firebase.database().ref().update(update)
+    const successMessage = 'Successfully added.'
+    commit(types.SET_SUCCESS, successMessage, { root: true })
+    // await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id + '/' + collectionUid + '/books').update({})
   }
 }
 
