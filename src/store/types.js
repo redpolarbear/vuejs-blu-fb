@@ -16,6 +16,7 @@ export const IS_FOLLOWING = 'authentication/profile/relationship/GET_IS_FOLLOWIN
 export const BOOK_INFO = 'library/book/GET_BOOK_INFO'
 
 export const COLLECTIONS = 'library/collection/GET_COLLECTIONS'
+export const ADDING_LOCK = 'library/collection/GET_ADDING_LOCK'
 
 // Mutations
 export const SET_LOADING = 'shared/SET_LOADING'
@@ -38,10 +39,11 @@ export const SET_IS_FOLLOWING = 'authentication/profile/relationship/SET_IS_FOLL
 
 export const SET_BOOK_INFO = 'library/book/SET_BOOK_INFO'
 
+export const SET_ADDING_LOCK = 'library/collection/SET_ADDING_LOCK'
 export const ADD_ONE_EMPTY_COLLECTION = 'library/collection/ADD_ONE_EMPTY_COLLECTION'
-export const REMOVE_ONE_EMPTY_COLLECTION = 'library/collection/REMOVE_ONE_EMPTY_COLLECTION'
+export const REMOVE_ONE_COLLECTION = 'library/collection/REMOVE_ONE_COLLECTION'
 export const UPDATE_ONE_COLLECTION = 'library/collection/UPDATE_ONE_COLLECTION'
-export const TOGGLE_COLLECTION_EDITING = 'library/collection/TOGGLE_COLLECTION_EDITING'
+export const ENABLE_COLLECTION_EDITING = 'library/collection/ENABLE_COLLECTION_EDITING'
 
 // Actions
 export const ACTION_USER_LOGIN_ASYNC = 'authentication/USER_LOGIN'
@@ -61,3 +63,6 @@ export const ACTION_SEARCH_BOOK_BY_ISBN_IN_FB_ASYNC = 'library/book/SEARCH_BOOK_
 export const ACTION_SAVE_BOOK_INFO_INTO_FB_ASYNC = 'library/book/SAVE_BOOK_INFO_INTO_FB_ASYNC'
 
 export const ACTION_LOAD_COLLECTIONS_ASYNC = 'library/collection/LOAD_COLLECTIONS_ASYNC'
+export const ACTION_SAVE_ONE_COLLECTION_INTO_FB = 'library/collection/SAVE_ONE_COLLECTION_INTO_FB'
+export const ACTION_REMOVE_ONE_COLLECTION_FROM_FB = 'library/collection/REMOVE_ONE_COLLECTION_FROM_FB'
+

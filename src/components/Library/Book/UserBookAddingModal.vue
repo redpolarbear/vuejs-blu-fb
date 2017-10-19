@@ -3,14 +3,14 @@
     :width="520" 
     :is-show="showAddingModal" 
     transition="fadeDown"
-    @close="$emit('showAddingModal', false)"
+    @close="closeModal"
     :backdrop-closable="false">
     <div slot="header" class="modal-header">
       <div class="is-pulled-left">
         <p class="title">Your Collections</p>
       </div>
       <div class="is-pulled-right">
-        <a class="button is-small is-white" @click="addNewCollection">
+        <a class="button is-small is-white" @click="addNewCollection" :disabled="getAddingLock">
           <span class="icon is-small">
             <i class="fa fa-plus-circle"></i>
           </span>
@@ -20,12 +20,15 @@
     </div>
 
     <div class="columns" v-for="(item, index) in getCollections" :key="index">
-      <!-- <div class="column is-2 has-text-centered collection-image">
-        <img src="http://placehold.it/64x64">
-      </div> -->
+      <div class="column is-1 has-text-centered collection-check">
+        <a class="button is-large is-white collection-check-button">
+          <span class="icon is-large collection-check-button-icon">
+            <i class="fa fa-folder-o"></i>
+          </span>
+        </a>
+      </div>
       <div class="column collection-name">
         <p class="control">
-          <!-- <input class="input" v-bind:class="{ 'is-static': isEntered }" type="text" placeholder="Text input" value="hello" v-on:keyup.enter="newCollectionEnter" :readonly="isEntered"> -->
           <input 
             class="input" 
             v-bind:class="{ 'is-static': !item.isEditing }" 
@@ -35,19 +38,18 @@
             v-on:keyup.enter="completeEditing(item, index)"
             type="text" 
             v-focus
-            v-model="item.name" 
-            >
+            v-model="item.collection.name">
         </p>
         <p v-if="!item.isEditing">0 Books</p>
       </div>
-      <div class="column is-3 is-pulled-right" v-if="!item.isEditing && item.name !== 'My Reading Collection' && item.name !== 'My Read Collection'">
-        <p class="control has-addons collection-buttons">
-          <a class="button is-white" @click="toggleEdit(index)">
+      <div class="column is-3 is-pulled-right" v-if="!item.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
+        <p class="control has-addons collection-buttons-group">
+          <a class="button is-white" @click="enableEdit(index)">
             <span class="icon">
               <i class="fa fa-edit"></i>
             </span>
           </a>
-          <a class="button is-danger is-inverted" @click="trashCollection(index)">
+          <a class="button is-danger is-inverted" @click="trashCollection(item.collection.uid, index)">
             <span class="icon">
               <i class="fa fa-trash"></i>
             </span>
@@ -56,9 +58,43 @@
       </div>
     </div>
 
+    <!-- <div class="columns">
+      <div class="column is-1 has-text-centered collection-check">
+        <a class="button is-large is-white collection-check-button">
+          <span class="icon is-large collection-check-button-icon">
+            <i class="fa fa-folder-open-o"></i>
+          </span>
+        </a>
+      </div>
+      <div class="column collection-name">
+        <p class="control">
+          <input 
+            class="input is-static" 
+            readonly
+            type="text" 
+            value="My Testing Collection">
+        </p>
+        <p>0 Books</p>
+      </div>
+      <div class="column is-3 is-pulled-right">
+        <p class="control has-addons collection-buttons-group">
+          <a class="button is-white">
+            <span class="icon is-medium">
+              <i class="fa fa-edit"></i>
+            </span>
+          </a>
+          <a class="button is-danger is-inverted">
+            <span class="icon is-medium">
+              <i class="fa fa-trash"></i>
+            </span>
+          </a>
+        </p>          
+      </div>
+    </div> -->
+<!-- 
     <p v-for="(item, index) in getCollections" :key="index">
-      {{ item.name }}
-    </p>
+      {{ item.collection.name }}
+    </p> -->
 
     <!-- <p v-for="(value, key, index) in getCollections" :key="key">
       {{ value.name }}
@@ -139,33 +175,42 @@ export default {
   directives: { focus },
   computed: {
     ...mapGetters({
-      getCollections: types.COLLECTIONS
+      getCollections: types.COLLECTIONS,
+      getAddingLock: types.ADDING_LOCK
     })
   },
   data () {
     return {
-      isEntered: false
     }
   },
   methods: {
+    closeModal () {
+      this.$emit('showAddingModal', false)
+      this.$store.commit(types.SET_ADDING_LOCK, false)
+    },
     addNewCollection () {
       this.$store.commit(types.ADD_ONE_EMPTY_COLLECTION)
+      this.$store.commit(types.SET_ADDING_LOCK, true)
     },
     completeEditing (item, index) {
-      if (item.name) {
-        this.$store.commit(types.UPDATE_ONE_COLLECTION, {
+      if (item.collection.name) {
+        this.$store.dispatch(types.ACTION_SAVE_ONE_COLLECTION_INTO_FB, {
+          collection: item.collection,
           index,
-          name: item.name
+          isEditing: false
         })
       } else {
-        this.$store.commit(types.REMOVE_ONE_EMPTY_COLLECTION, { index })
+        this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
       }
+      this.$store.commit(types.SET_ADDING_LOCK, false)
     },
-    toggleEdit (index) {
-      this.$store.commit(types.TOGGLE_COLLECTION_EDITING, { index })
+    enableEdit (index) {
+      this.$store.commit(types.ENABLE_COLLECTION_EDITING, { index })
+      this.$store.commit(types.SET_ADDING_LOCK, !this.getAddingLock)
     },
-    trashCollection (index) {
-      this.$store.commit(types.REMOVE_ONE_EMPTY_COLLECTION, { index })
+    trashCollection (uid, index) {
+      // this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
+      this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid } })
     }
   }
 }
@@ -187,26 +232,29 @@ input.is-static {
   padding-left: 0;
   padding-right: 0;
 }
-
-.column.collection-image {
-  margin-left: 10px;
+.column.collection-check {
+  margin: auto;
 }
-
+.button.collection-check-button {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 .column.collection-name {
   padding-right: 30px;
-  padding-left: 30px;
+  padding-left: 40px;
 }
-
+.icon.collection-check-button-icon {
+  margin-right: 0;
+  margin-left: 0;
+}
 .column.collection-name > p.control {
   margin-bottom: 2px;
 }
-
-.control.has-addons.collection-buttons {
+.control.has-addons.collection-buttons-group {
   justify-content: center;
   text-align: center;
 }
-
-.control.has-addons.collection-buttons > .button .icon {
+.control.has-addons.collection-buttons-group > .button .icon {
   margin-left: 0;
   margin-right: 0;
 }
