@@ -22,7 +22,7 @@
     </div>
     <div class="columns" v-for="(item, index) in getCollections" :key="index">
       <div class="column is-1 has-text-centered collection-check">
-        <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': item.isExisted || item.isEditing }" @click="checkCollection(item, index)">
+        <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': isAddingLocked }" @click="checkCollection(item, index)">
           <span class="icon is-large collection-check-button-icon">
             <i class="fa fa-folder-o" v-if="!item.isChecked"></i>
             <i class="fa fa-folder-open-o" v-else></i>
