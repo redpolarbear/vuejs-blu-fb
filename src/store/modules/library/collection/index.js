@@ -39,6 +39,10 @@ const mutations = {
     state.collections[payload.index] = Object.assign({}, _.omit(payload, 'index'))
     state.collections = [...state.collections.slice(0, payload.index), state.collections[payload.index], ...state.collections.slice(payload.index + 1)]
   },
+  UPDATE_ONE_COLLECTION_NAME (state, payload) {
+    state.collections[payload.index].collection.name = payload.collection.name
+    state.collections = [...state.collections.slice(0, payload.index), state.collections[payload.index], ...state.collections.slice(payload.index + 1)]
+  },
   ENABLE_COLLECTION_EDITING (state, payload) {
     state.collections[payload.index].meta.isEditing = true
     state.collections = [...state.collections.slice(0, payload.index), state.collections[payload.index], ...state.collections.slice(payload.index + 1)]
@@ -49,6 +53,10 @@ const mutations = {
   },
   TOGGLE_COLLECTION_CHECK (state, payload) {
     state.collections[payload.index].meta.isChecked = !state.collections[payload.index].meta.isChecked
+    state.collections = [...state.collections.slice(0, payload.index), state.collections[payload.index], ...state.collections.slice(payload.index + 1)]
+  },
+  TOGGLE_COLLECTION_ISEXISTED (state, payload) {
+    state.collections[payload.index].meta.isExisted = payload.switch
     state.collections = [...state.collections.slice(0, payload.index), state.collections[payload.index], ...state.collections.slice(payload.index + 1)]
   },
   ENABLE_COLLECTION_LOADING (state, payload) {
@@ -74,9 +82,7 @@ const actions = {
           booksNo: e[1].books === null ? 0 : _.size(e[1].books)
         }
       }, {collection: e[1]}))
-      // let arr = Object.entries(usersCollections).map(e => Object.assign(e[1], { key: e[0] }))
       commit('SET_COLLECTIONS', usersCollectionsArray)
-      // commit('SET_COLLECTIONS', Object.assign({}, usersCollections.val()))
     } catch (error) {
     }
   },
@@ -100,17 +106,9 @@ const actions = {
       }
     }
     await firebase.database().ref('userCollectionsBooks').child(rootGetters[types.USER].id).update(collection)
-    commit('UPDATE_ONE_COLLECTION', {
-      collection: collection[collectionKey],
-      index: payload.index,
-      meta: {
-        booksNo: payload.meta.booksNo,
-        isChecked: false,
-        isEditing: false,
-        isExisted: false,
-        isLoading: false
-      }
-    })
+    commit('UPDATE_ONE_COLLECTION', Object.assign({ index: payload.index }, {collection: collection[collectionKey]}, {meta: payload.meta}))
+    commit('DISABLE_COLLECTION_EDITING', { index: payload.index })
+    commit('TOGGLE_COLLECTION_ISEXISTED', { index: payload.index, switch: false })
     commit('DISABLE_COLLECTION_LOADING', { index: payload.index })
   },
   async REMOVE_ONE_COLLECTION_FROM_FB ({commit, rootGetters}, payload) {
@@ -138,7 +136,6 @@ const actions = {
     await firebase.database().ref().update(update)
     const successMessage = 'Successfully added.'
     commit(types.SET_SUCCESS, successMessage, { root: true })
-    // await firebase.database().ref('userCollectionsBooks/' + rootGetters[types.USER].id + '/' + collectionUid + '/books').update({})
   }
 }
 

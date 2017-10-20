@@ -43,8 +43,11 @@ export const SET_BOOK_INFO = 'library/book/SET_BOOK_INFO'
 export const ADD_ONE_EMPTY_COLLECTION = 'library/collection/ADD_ONE_EMPTY_COLLECTION'
 export const REMOVE_ONE_COLLECTION = 'library/collection/REMOVE_ONE_COLLECTION'
 export const UPDATE_ONE_COLLECTION = 'library/collection/UPDATE_ONE_COLLECTION'
+export const UPDATE_ONE_COLLECTION_NAME = 'library/collection/UPDATE_ONE_COLLECTION_NAME'
 export const ENABLE_COLLECTION_EDITING = 'library/collection/ENABLE_COLLECTION_EDITING'
+export const DISABLE_COLLECTION_EDITING = 'library/collection/DISABLE_COLLECTION_EDITING'
 export const TOGGLE_COLLECTION_CHECK = 'library/collection/TOGGLE_COLLECTION_CHECK'
+export const TOGGLE_COLLECTION_ISEXISTED = 'library/collection/TOGGLE_COLLECTION_ISEXISTED'
 export const CLEAR_COLLECTIONS = 'library/collection/CLEAR_COLLECTIONS'
 
 // Actions
