@@ -40,12 +40,12 @@ export const SET_IS_FOLLOWING = 'authentication/profile/relationship/SET_IS_FOLL
 
 export const SET_BOOK_INFO = 'library/book/SET_BOOK_INFO'
 
-// export const SET_ADDING_LOCK = 'library/collection/SET_ADDING_LOCK'
 export const ADD_ONE_EMPTY_COLLECTION = 'library/collection/ADD_ONE_EMPTY_COLLECTION'
 export const REMOVE_ONE_COLLECTION = 'library/collection/REMOVE_ONE_COLLECTION'
 export const UPDATE_ONE_COLLECTION = 'library/collection/UPDATE_ONE_COLLECTION'
 export const ENABLE_COLLECTION_EDITING = 'library/collection/ENABLE_COLLECTION_EDITING'
 export const TOGGLE_COLLECTION_CHECK = 'library/collection/TOGGLE_COLLECTION_CHECK'
+export const CLEAR_COLLECTIONS = 'library/collection/CLEAR_COLLECTIONS'
 
 // Actions
 export const ACTION_USER_LOGIN_ASYNC = 'authentication/USER_LOGIN'

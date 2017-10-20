@@ -24,31 +24,31 @@
       <div class="column is-1 has-text-centered collection-check">
         <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': isAddingLocked }" @click="checkCollection(item, index)">
           <span class="icon is-large collection-check-button-icon">
-            <i class="fa fa-folder-o" v-if="!item.isChecked"></i>
+            <i class="fa fa-folder-o" v-if="!item.meta.isChecked"></i>
             <i class="fa fa-folder-open-o" v-else></i>
           </span>
         </a>
       </div>
       <div class="column collection-name">
-        <p class="control" v-bind:class="{ 'is-loading': item.isLoading }">
+        <p class="control" v-bind:class="{ 'is-loading': item.meta.isLoading }">
           <input 
             class="input" 
-            v-bind:class="{ 'is-static': !item.isEditing, 'is-danger': item.isExisted }" 
-            :readonly="!item.isEditing" 
-            :placeholder="item.isEditing ? 'collection name' : false"
+            v-bind:class="{ 'is-static': !item.meta.isEditing, 'is-danger': item.meta.isExisted }" 
+            :readonly="!item.meta.isEditing" 
+            :placeholder="item.meta.isEditing ? 'collection name' : false"
             @focus="$event.target.select()"
             v-on:keyup.enter="completeEditing(item, index)"
             type="text" 
             v-focus
             v-model="item.collection.name">
-            <span class="help is-danger" v-if="item.isExisted">The Collection has been existed.</span>
+            <span class="help is-danger" v-if="item.meta.isExisted">The Collection has been existed.</span>
             <!-- v-on:blur="item.isEditing ? completeEditing(item, index) : null" -->
         </p>
-        <p v-if="!item.isEditing">{{ item.booksNo }} Book(s)</p>
+        <p v-if="!item.meta.isEditing">{{ item.meta.booksNo }} Book(s)</p>
       </div>
-      <div class="column is-3 is-pulled-right" v-if="!item.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
+      <div class="column is-3 is-pulled-right" v-if="!item.meta.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
         <p class="control has-addons collection-buttons-group">
-          <a class="button is-white" @click="enableEdit(index)">
+          <a class="button is-white" @click="enableEdit(item, index)">
             <span class="icon">
               <i class="fa fa-edit"></i>
             </span>
@@ -178,7 +178,6 @@ export default {
   computed: {
     ...mapGetters({
       getCollections: types.COLLECTIONS
-      // getAddingLock: types.ADDING_LOCK
     }),
     isAddingLocked: function () {
       return this.addingLock
@@ -187,54 +186,61 @@ export default {
   data () {
     return {
       addingLock: false,
-      checkedIndex: null
+      checkedIndex: null,
+      originalItemName: ''
     }
   },
   methods: {
     closeModal () {
-      this.$emit('showAddingModal', false)
-      // this.$store.commit(types.SET_ADDING_LOCK, false)
       this.addingLock = false
       this.checkedIndex = null
+      this.originalItemName = ''
+      this.$store.commit(types.CLEAR_COLLECTIONS)
+      this.$emit('showAddingModal', false)
     },
     addNewCollection () {
       this.$store.commit(types.ADD_ONE_EMPTY_COLLECTION)
-      // this.$store.commit(types.SET_ADDING_LOCK, true)
       this.addingLock = true
     },
     completeEditing (item, index) {
       if (item.collection.name.trim()) {
         const isExisted = _.findIndex(this.getCollections.filter((e, indx) => indx !== index), e => e.collection.name.trim() === item.collection.name.trim())
-        isExisted === -1 ? item.isExisted = false : item.isExisted = true
-        if (!item.isExisted) {
+        isExisted === -1 ? item.meta.isExisted = false : item.meta.isExisted = true
+        if (!item.meta.isExisted) {
           this.$store.dispatch(types.ACTION_SAVE_ONE_COLLECTION_INTO_FB, {
-            booksNo: item.booksNo,
             collection: item.collection,
             index,
-            isChecked: false,
-            isEditing: false,
-            isExisted: false,
-            isLoading: false
+            meta: {
+              booksNo: item.meta.booksNo,
+              isChecked: false,
+              isEditing: false,
+              isExisted: false,
+              isLoading: false
+            }
           })
         } else {
           return
         }
       } else {
-        this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
+        if (item.meta.booksNo === 0) {
+          this.$store.commit(types.REMOVE_ONE_COLLECTION, { index })
+        } else {
+          this.getCollections[index].collection.name = this.originalItemName
+          this.getCollections[index].meta.isEditing = false
+        }
       }
-      // this.$store.commit(types.SET_ADDING_LOCK, false)
       this.addingLock = false
     },
-    enableEdit (index) {
+    enableEdit (item, index) {
       this.$store.commit(types.ENABLE_COLLECTION_EDITING, { index })
-      // this.$store.commit(types.SET_ADDING_LOCK, !this.getAddingLock)
+      this.originalItemName = item.collection.name
       this.addingLock = true
     },
     trashCollection (item, index) {
-      if (item.booksNo !== 0) {
+      if (item.meta.booksNo !== 0) {
         const infoMessage = 'The collection is not empty.'
         this.$store.commit(types.SET_INFO, infoMessage)
-      } else if (item.booksNo === 0) {
+      } else if (item.meta.booksNo === 0) {
         this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid: item.collection.uid } })
       }
     },
