@@ -20,6 +20,7 @@
         </a>
       </div>
     </div>
+    <alert title="warning!" type="warning" :closable="false" v-if="infoFlag">{{ infoMessage }}</alert>
     <div class="columns" v-for="(item, index) in getCollections" :key="index">
       <div class="column is-1 has-text-centered collection-check">
         <a class="button is-large is-white collection-check-button" v-bind:class="{ 'is-disabled': isAddingLocked }" @click="checkCollection(item, index)">
@@ -48,12 +49,12 @@
       </div>
       <div class="column is-3 is-pulled-right" v-if="!item.meta.isEditing && item.collection.name !== 'My Reading Collection' && item.collection.name !== 'My Read Collection'">
         <p class="control has-addons collection-buttons-group">
-          <a class="button is-white" @click="enableEdit(item, index)">
+          <a class="button is-white" @click="enableEdit(item, index)" v-bind:class="{ 'is-disabled': isAddingLocked }">
             <span class="icon">
               <i class="fa fa-edit"></i>
             </span>
           </a>
-          <a class="button is-danger is-inverted" @click="trashCollection(item, index)">
+          <a class="button is-danger is-inverted" @click="trashCollection(item, index)" v-bind:class="{ 'is-disabled': isAddingLocked }">
             <span class="icon">
               <i class="fa fa-trash"></i>
             </span>
@@ -183,11 +184,22 @@ export default {
       return this.addingLock
     }
   },
+  watch: {
+    infoFlag: function (value) {
+      if (value === true) {
+        setTimeout(() => {
+          this.infoFlag = false
+        }, 2000)
+      }
+    }
+  },
   data () {
     return {
       addingLock: false,
       checkedIndex: null,
-      originalItemName: ''
+      originalItemName: '',
+      infoMessage: '',
+      infoFlag: false
     }
   },
   methods: {
@@ -195,6 +207,8 @@ export default {
       this.addingLock = false
       this.checkedIndex = null
       this.originalItemName = ''
+      this.infoFlag = false
+      this.infoMessage = ''
       this.$store.commit(types.CLEAR_COLLECTIONS)
       this.$emit('showAddingModal', false)
     },
@@ -227,6 +241,7 @@ export default {
         } else {
           this.getCollections[index].collection.name = this.originalItemName
           this.getCollections[index].meta.isEditing = false
+          this.getCollections[index].meta.isExisted = false
         }
       }
       this.addingLock = false
@@ -238,8 +253,8 @@ export default {
     },
     trashCollection (item, index) {
       if (item.meta.booksNo !== 0) {
-        const infoMessage = 'The collection is not empty.'
-        this.$store.commit(types.SET_INFO, infoMessage)
+        this.infoMessage = 'The collection is not empty.'
+        this.infoFlag = true
       } else if (item.meta.booksNo === 0) {
         this.$store.dispatch(types.ACTION_REMOVE_ONE_COLLECTION_FROM_FB, { index, collection: { uid: item.collection.uid } })
       }
