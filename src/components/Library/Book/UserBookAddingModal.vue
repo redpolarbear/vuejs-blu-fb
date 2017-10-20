@@ -188,11 +188,10 @@ export default {
       }
     },
     addToCollection () {
-      if (this.checkedIndex === null) {
-        this.closeModal()
-      } else {
+      if (this.checkedIndex !== null) {
         this.$store.dispatch(types.ACTION_SAVE_THE_BOOK_INTO_COLLECTION_IN_FB, { checkedIndex: this.checkedIndex })
       }
+      this.closeModal()
     }
   }
 }
